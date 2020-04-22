@@ -59,6 +59,7 @@ import org.springframework.core.annotation.AliasFor;
 public @interface Cacheable {
 
 	/**
+	 * 缓存名称，可以写多个
 	 * Alias for {@link #cacheNames}.
 	 */
 	@AliasFor("cacheNames")
@@ -76,6 +77,7 @@ public @interface Cacheable {
 	String[] cacheNames() default {};
 
 	/**
+	 * 支持SpEL
 	 * Spring Expression Language (SpEL) expression for computing the key dynamically.
 	 * <p>Default is {@code ""}, meaning all method parameters are considered as a key,
 	 * unless a custom {@link #keyGenerator} has been configured.
@@ -95,6 +97,7 @@ public @interface Cacheable {
 	String key() default "";
 
 	/**
+	 * 它和key互斥，只能使用其中一个
 	 * The bean name of the custom {@link org.springframework.cache.interceptor.KeyGenerator}
 	 * to use.
 	 * <p>Mutually exclusive with the {@link #key} attribute.
@@ -120,6 +123,7 @@ public @interface Cacheable {
 	String cacheResolver() default "";
 
 	/**
+	 * 支持SpEL，只有条件为true时，才会作用到方法上
 	 * Spring Expression Language (SpEL) expression used for making the method
 	 * caching conditional.
 	 * <p>Default is {@code ""}, meaning the method result is always cached.
@@ -163,6 +167,8 @@ public @interface Cacheable {
 	String unless() default "";
 
 	/**
+	 * true：表示强制同步执行。（若多个线程试图为同一个键加载值，以同步的方式来进行目标方法的调用）
+	 * 同步的好处是：后一个线程会读取到前一个缓存的缓存数据，不用再查库了
 	 * Synchronize the invocation of the underlying method if several threads are
 	 * attempting to load a value for the same key. The synchronization leads to
 	 * a couple of limitations:

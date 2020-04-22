@@ -44,6 +44,7 @@ import org.springframework.core.annotation.AliasFor;
  * @author Sam Brannen
  * @since 3.1
  * @see CacheConfig
+ * 缓存更新
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

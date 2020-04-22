@@ -23,6 +23,7 @@ import java.util.Set;
 import org.springframework.util.Assert;
 
 /**
+ * 缓存操作的基类。我们知道不同的缓存注解，都有不同的缓存操作并且注解内的属性也挺多，此类就是对缓存操作的抽象
  * Base class for cache operations.
  *
  * @author Costin Leau
@@ -126,6 +127,7 @@ public abstract class CacheOperation implements BasicOperation {
 
 
 	/**
+	 * CacheOperation生成器
 	 * @since 4.3
 	 */
 	public abstract static class Builder {

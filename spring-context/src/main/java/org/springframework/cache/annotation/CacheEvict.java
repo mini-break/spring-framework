@@ -37,6 +37,7 @@ import org.springframework.core.annotation.AliasFor;
  * @author Sam Brannen
  * @since 3.1
  * @see CacheConfig
+ * 缓存删除
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -129,6 +130,7 @@ public @interface CacheEvict {
 	String condition() default "";
 
 	/**
+	 * 是否把上面cacheNames指定的所有的缓存都清除掉，默认false
 	 * Whether all the entries inside the cache(s) are removed.
 	 * <p>By default, only the value under the associated key is removed.
 	 * <p>Note that setting this parameter to {@code true} and specifying a
@@ -137,6 +139,7 @@ public @interface CacheEvict {
 	boolean allEntries() default false;
 
 	/**
+	 * 是否让清理缓存动作在目标方法之前执行，默认是false（在目标方法之后执行）
 	 * Whether the eviction should occur before the method is invoked.
 	 * <p>Setting this attribute to {@code true}, causes the eviction to
 	 * occur irrespective of the method outcome (i.e., whether it threw an

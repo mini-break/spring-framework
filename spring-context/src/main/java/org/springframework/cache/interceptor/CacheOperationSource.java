@@ -29,10 +29,12 @@ import org.springframework.lang.Nullable;
  * @author Costin Leau
  * @author Juergen Hoeller
  * @since 3.1
+ * 缓存属性源
  */
 public interface CacheOperationSource {
 
 	/**
+	 * 返回Method方法上面所有的缓存操作(显然一个Method上可以对应有多个缓存操作)
 	 * Return the collection of cache operations for this method,
 	 * or {@code null} if the method contains no <em>cacheable</em> annotations.
 	 * @param method the method to introspect
