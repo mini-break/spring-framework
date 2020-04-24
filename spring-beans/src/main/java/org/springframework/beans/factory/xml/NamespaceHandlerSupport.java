@@ -80,7 +80,9 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 */
 	@Nullable
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
+		// 获取元素名称 如：<my:user id="testuser" email="dad" username="ddd"></my:user> 此时localName=user
 		String localName = parserContext.getDelegate().getLocalName(element);
+		// 根据localName找到对应的解析器
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(
@@ -103,6 +105,11 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	}
 
 	/**
+	 * BeanDefinitionDecorator，其实就是存放在一个map里面：tagName->BeanDefinitionDecorator
+	 * 重写init方法为自定义标签指定BeanDefinitionDecorator
+	 * 可以使用NamespaceHandlerSupport#registerBeanDefinitionDecorator(String
+	 * elementName, BeanDefinitionDecorator dec)即可
+	 *
 	 * Locates the {@link BeanDefinitionParser} from the register implementations using
 	 * the local name of the supplied {@link Node}. Supports both {@link Element Elements}
 	 * and {@link Attr Attrs}.
@@ -111,10 +118,11 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	private BeanDefinitionDecorator findDecoratorForNode(Node node, ParserContext parserContext) {
 		BeanDefinitionDecorator decorator = null;
 		String localName = parserContext.getDelegate().getLocalName(node);
+		// 自定义子节点
 		if (node instanceof Element) {
 			decorator = this.decorators.get(localName);
 		}
-		else if (node instanceof Attr) {
+		else if (node instanceof Attr) {// 自定义属性
 			decorator = this.attributeDecorators.get(localName);
 		}
 		else {
