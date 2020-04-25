@@ -462,6 +462,7 @@ public class BeanDefinitionParserDelegate {
 		 * 解析bean属性
 		 */
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
+		// 到这里，整个 <bean /> 标签就算解析结束了，一个 BeanDefinition 就形成了
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
 				try {
@@ -479,6 +480,7 @@ public class BeanDefinitionParserDelegate {
 						if (beanClassName != null &&
 								beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
 								!this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
+							// 把 beanClassName 设置为 Bean 的别名
 							aliases.add(beanClassName);
 						}
 					}

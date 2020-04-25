@@ -34,21 +34,37 @@ import org.springframework.util.ObjectUtils;
  * @since 1.2
  * @see BeanDefinition#getPropertyValues
  * @see org.springframework.beans.MutablePropertyValues#addPropertyValue
+ * 存储字符串类型元数据
  */
 public class TypedStringValue implements BeanMetadataElement {
 
+	/**
+	 * 值
+	 */
 	@Nullable
 	private String value;
 
+	/**
+	 * 类型
+	 */
 	@Nullable
 	private volatile Object targetType;
 
+	/**
+	 *
+	 */
 	@Nullable
 	private Object source;
 
+	/**
+	 * 指定的类型
+	 */
 	@Nullable
 	private String specifiedTypeName;
 
+	/**
+	 * 动态获取值
+	 */
 	private volatile boolean dynamic;
 
 

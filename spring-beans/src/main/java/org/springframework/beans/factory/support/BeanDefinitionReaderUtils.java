@@ -161,6 +161,10 @@ public class BeanDefinitionReaderUtils {
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {
 			for (String alias : aliases) {
+				/**
+				 * alias -> beanName 保存它们的别名信息，这个很简单，用一个 map 保存一下就可以了，
+				 * 获取的时候，会先将 alias 转换为 beanName，然后再查找
+				 */
 				registry.registerAlias(beanName, alias);
 			}
 		}

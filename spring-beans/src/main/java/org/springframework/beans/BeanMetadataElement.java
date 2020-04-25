@@ -19,6 +19,7 @@ package org.springframework.beans;
 import org.springframework.lang.Nullable;
 
 /**
+ * 字面翻译这个接口就是bean的元数据元素，它可以获得bean的配置定义的一个元素。在XML文件中来说，就是会持有一个bean标签。
  * Interface to be implemented by bean metadata elements
  * that carry a configuration source object.
  *
