@@ -71,6 +71,11 @@ package org.springframework.core.env;
 public interface Environment extends PropertyResolver {
 
 	/**
+	 * 获取当前环境对象激活的所有profile组
+	 * 一个profile组，是一个以name名称命名的、逻辑上的、要被注册到容器中的BeanDefinition的集合。
+	 * 简单一点说，一个profile就代表一组BeanDefinition，这个对应配置文件中<beans profile="">。
+	 * 当加载解析xml配置文件的时候，只有active=true激活的BeanDefinition才会被加载进容器。
+	 *
 	 * Return the set of profiles explicitly made active for this environment. Profiles
 	 * are used for creating logical groupings of bean definitions to be registered
 	 * conditionally, for example based on deployment environment.  Profiles can be
@@ -86,6 +91,10 @@ public interface Environment extends PropertyResolver {
 	String[] getActiveProfiles();
 
 	/**
+	 * 获取默认的profile组。
+	 * 如果当前环境对象中激活的组为空（getActiveProfiles()返回空数组）的话，
+	 * 则会启用默认profile组。
+	 *
 	 * Return the set of profiles to be active by default when no active profiles have
 	 * been set explicitly.
 	 * @see #getActiveProfiles
@@ -95,6 +104,11 @@ public interface Environment extends PropertyResolver {
 	String[] getDefaultProfiles();
 
 	/**
+	 * 判断给定的一个或多个组中，是否存在满足当前环境对象配置的组（任意一个组满足即可）。
+	 * 如：
+	 * 调用acceptsProfiles("p1","!p2")，如果当前环境对象激活了p1，
+	 * 或者没有激活p2（注意是或，满足一个条件即可），则返回true，否则返回false。
+	 *
 	 * Return whether one or more of the given profiles is active or, in the case of no
 	 * explicit active profiles, whether one or more of the given profiles is included in
 	 * the set of default profiles. If a profile begins with '!' the logic is inverted,
