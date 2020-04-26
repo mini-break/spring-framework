@@ -46,6 +46,7 @@ public class PropertySourceTests {
 		MapPropertySource mps = new MapPropertySource("mps", map1);
 		assertThat(mps, equalTo(mps));
 
+		// 属性源的name相同则认为是相等属性源
 		assertThat(new MapPropertySource("x", map1).equals(new MapPropertySource("x", map1)), is(true));
 		assertThat(new MapPropertySource("x", map1).equals(new MapPropertySource("x", map2)), is(true));
 		assertThat(new MapPropertySource("x", map1).equals(new PropertiesPropertySource("x", props1)), is(true));

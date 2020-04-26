@@ -67,6 +67,8 @@ package org.springframework.core.env;
  * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment
  * @see org.springframework.context.ConfigurableApplicationContext#setEnvironment
  * @see org.springframework.context.support.AbstractApplicationContext#createEnvironment
+ *
+ * Environment 翻译过来即是“环境”，表示应用程序运行环境。而在 Spring 应用中，环境包含两个方面的内容：profiles 和 properties
  */
 public interface Environment extends PropertyResolver {
 

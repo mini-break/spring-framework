@@ -67,6 +67,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	public static final String IGNORE_GETENV_PROPERTY_NAME = "spring.getenv.ignore";
 
 	/**
+	 * 激活剖面的属性名
 	 * Name of property to set to specify active profiles: {@value}. Value may be comma
 	 * delimited.
 	 * <p>Note that certain shell environments such as Bash disallow the use of the period
@@ -89,6 +90,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	public static final String DEFAULT_PROFILES_PROPERTY_NAME = "spring.profiles.default";
 
 	/**
+	 * 默认profile名称
 	 * Name of reserved default profile name: {@value}. If no default profile names are
 	 * explicitly and no active profile names are explicitly set, this profile will
 	 * automatically be activated by default.
@@ -103,12 +105,24 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 激活的剖面集合
+	 */
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
 
+	/**
+	 * 默认的剖面集合
+	 */
 	private final Set<String> defaultProfiles = new LinkedHashSet<>(getReservedDefaultProfiles());
 
+	/**
+	 * 属性源集合
+	 */
 	private final MutablePropertySources propertySources = new MutablePropertySources(this.logger);
 
+	/**
+	 * 属性解析器
+	 */
 	private final ConfigurablePropertyResolver propertyResolver =
 			new PropertySourcesPropertyResolver(this.propertySources);
 
@@ -121,6 +135,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 * @see #customizePropertySources(MutablePropertySources)
 	 */
 	public AbstractEnvironment() {
+		// 调用定制化方法
 		customizePropertySources(this.propertySources);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Initialized " + getClass().getSimpleName() + " with PropertySources " + this.propertySources);
@@ -129,6 +144,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 
 
 	/**
+	 * 通过MutablePropertySources定制Environment properties
 	 * Customize the set of {@link PropertySource} objects to be searched by this
 	 * {@code Environment} during calls to {@link #getProperty(String)} and related
 	 * methods.
@@ -355,6 +371,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	}
 
 	/**
+	 * 校验剖面
 	 * Validate the given profile, called internally prior to adding to the set of
 	 * active or default profiles.
 	 * <p>Subclasses may override to impose further restrictions on profile syntax.
@@ -382,6 +399,7 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Map<String, Object> getSystemProperties() {
 		try {
+			// 获取当前系统的属性
 			return (Map) System.getProperties();
 		}
 		catch (AccessControlException ex) {

@@ -652,7 +652,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		/**
-		 * 留给子类覆盖
+		 * 留给子类覆盖,设置一下属性源
 		 */
 		// Initialize any placeholder property sources in the context environment.
 		initPropertySources();

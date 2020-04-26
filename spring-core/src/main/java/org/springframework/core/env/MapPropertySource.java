@@ -28,6 +28,8 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 3.1
  * @see PropertiesPropertySource
+ *
+ * 值的类型为Map的属性源
  */
 public class MapPropertySource extends EnumerablePropertySource<Map<String, Object>> {
 

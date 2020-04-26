@@ -68,6 +68,8 @@ import java.util.Map;
  * @since 3.1
  * @see StandardEnvironment
  * @see org.springframework.context.ConfigurableApplicationContext#getEnvironment
+ *
+ * 提供设置激活的 profile 和默认的 profile 的功能
  */
 public interface ConfigurableEnvironment extends Environment, ConfigurablePropertyResolver {
 

@@ -24,6 +24,8 @@ import org.springframework.lang.Nullable;
  * @author Chris Beams
  * @since 3.1
  * @see PropertySource
+ *
+ * PropertySources聚合了PropertySource,提供了property的多数据源访问。其中MutablePropertySources是PropertySources的默认实现
  */
 public interface PropertySources extends Iterable<PropertySource<?>> {
 

@@ -37,6 +37,8 @@ import org.springframework.core.env.PropertySource;
  * @author Chris Beams
  * @since 3.1
  * @see org.springframework.mock.env.MockEnvironment
+ *
+ * 测试属性源,只用于测试
  */
 public class MockPropertySource extends PropertiesPropertySource {
 

@@ -52,6 +52,10 @@ public class StandardEnvironmentTests {
 	private static final Object NON_STRING_PROPERTY_NAME = new Object();
 	private static final Object NON_STRING_PROPERTY_VALUE = new Object();
 
+	/**
+	 * 创建标准Environment
+	 * 这一步会初始化加载System.getProperties和System.getenv()环境变量
+	 */
 	private final ConfigurableEnvironment environment = new StandardEnvironment();
 
 
@@ -146,6 +150,9 @@ public class StandardEnvironmentTests {
 		environment.setActiveProfiles("");
 	}
 
+	/**
+	 * 剖面不能以"!"开头
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void setActiveProfiles_withNotOperator() {
 		environment.setActiveProfiles("p1", "!p2");

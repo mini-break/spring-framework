@@ -55,13 +55,21 @@ import org.springframework.util.ObjectUtils;
  * @see PropertySourcesPropertyResolver
  * @see MutablePropertySources
  * @see org.springframework.context.annotation.PropertySource
+ *
+ * 顾名思义就是属性源的意思,再具体一点就是对获取键值对资源的抽象类
  */
 public abstract class PropertySource<T> {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 属性源的名字
+	 */
 	protected final String name;
 
+	/**
+	 * 属性源的值,这个值的类型可以是Map,Properties等
+	 */
 	protected final T source;
 
 
@@ -123,6 +131,7 @@ public abstract class PropertySource<T> {
 
 
 	/**
+	 * 属性源的name相同则认为两个属性源相等
 	 * This {@code PropertySource} object is equal to the given object if:
 	 * <ul>
 	 * <li>they are the same instance

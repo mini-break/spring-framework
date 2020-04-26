@@ -256,6 +256,9 @@ public class PropertySourcesPropertyResolverTests {
 		new PropertySourcesPropertyResolver(new MutablePropertySources()).resolveRequiredPlaceholders(null);
 	}
 
+	/**
+	 * 设置必设属性----校验必设属性在Environment中是否有值
+	 */
 	@Test
 	public void setRequiredProperties_andValidateRequiredProperties() {
 		// no properties have been marked as required -> validation should pass
@@ -266,6 +269,7 @@ public class PropertySourcesPropertyResolverTests {
 
 		// neither foo nor bar properties are present -> validating should throw
 		try {
+			// 没的设置foo,bar属性值,所以校验失败
 			propertyResolver.validateRequiredProperties();
 			fail("expected validation exception");
 		}
@@ -278,6 +282,7 @@ public class PropertySourcesPropertyResolverTests {
 		// add foo property -> validation should fail only on missing 'bar' property
 		testProperties.put("foo", "fooValue");
 		try {
+			// 只设置了foo属性值,没有设置bar属性值，所以校验失败
 			propertyResolver.validateRequiredProperties();
 			fail("expected validation exception");
 		}
@@ -289,6 +294,7 @@ public class PropertySourcesPropertyResolverTests {
 
 		// add bar property -> validation should pass, even with an empty string value
 		testProperties.put("bar", "");
+		// foo,bar属性值都设置了,所以校验通过
 		propertyResolver.validateRequiredProperties();
 	}
 
