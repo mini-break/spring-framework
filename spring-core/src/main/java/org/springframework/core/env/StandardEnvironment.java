@@ -50,6 +50,8 @@ package org.springframework.core.env;
  * @see ConfigurableEnvironment
  * @see SystemEnvironmentPropertySource
  * @see org.springframework.web.context.support.StandardServletEnvironment
+ *
+ * 标准环境，普通 Java 应用时使用，会自动注册 System.getProperties() 和 System.getenv()到环境
  */
 public class StandardEnvironment extends AbstractEnvironment {
 
@@ -61,6 +63,7 @@ public class StandardEnvironment extends AbstractEnvironment {
 
 
 	/**
+	 * 标准环境下,普通 Java 应用时使用，会自动定制 System.getProperties() 和 System.getenv() properties 到环境
 	 * Customize the set of property sources with those appropriate for any standard
 	 * Java environment:
 	 * <ul>
@@ -75,8 +78,10 @@ public class StandardEnvironment extends AbstractEnvironment {
 	 */
 	@Override
 	protected void customizePropertySources(MutablePropertySources propertySources) {
+		// getSystemProperties是获取系统的相关属性,包括文件编码,操作系统名称,区域,用户名等,此属性一般由jvm自动获取,不能设置
 		propertySources.addLast(
 				new PropertiesPropertySource(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME, getSystemProperties()));
+		// getSystemEnvironment是获取系统的环境变更，对于windows对在系统属性-->高级-->环境变量中设置的变量将显示在此(对于linux,通过export设置的变量将显示在此)
 		propertySources.addLast(
 				new SystemEnvironmentPropertySource(SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME, getSystemEnvironment()));
 	}
