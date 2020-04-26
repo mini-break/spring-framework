@@ -58,6 +58,7 @@ public class BeanFactoryPostProcessorTests {
 		ac.registerSingleton("tb2", TestBean.class);
 		TestBeanFactoryPostProcessor bfpp = new TestBeanFactoryPostProcessor();
 		ac.addBeanFactoryPostProcessor(bfpp);
+		// 刚开始没有调用BeanFactoryPostProcessor处理，所以仍是false
 		assertFalse(bfpp.wasCalled);
 		ac.refresh();
 		assertTrue(bfpp.wasCalled);
