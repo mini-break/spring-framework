@@ -59,6 +59,7 @@ public class BeanFactoryPostProcessorTests {
 		TestBeanFactoryPostProcessor bfpp = new TestBeanFactoryPostProcessor();
 		// 通过硬编码设置BeanFactoryPostProcessor
 		ac.addBeanFactoryPostProcessor(bfpp);
+		// 刚开始没有调用BeanFactoryPostProcessor处理，所以仍是false
 		assertFalse(bfpp.wasCalled);
 		ac.refresh();
 		assertTrue(bfpp.wasCalled);
