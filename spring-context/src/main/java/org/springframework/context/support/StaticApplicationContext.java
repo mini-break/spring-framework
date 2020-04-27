@@ -86,6 +86,7 @@ public class StaticApplicationContext extends GenericApplicationContext {
 	}
 
 	/**
+	 * 注册单例Bean到BeanFactory
 	 * Register a singleton bean with the underlying bean factory.
 	 * <p>For more advanced needs, register with the underlying BeanFactory directly.
 	 * @see #getDefaultListableBeanFactory

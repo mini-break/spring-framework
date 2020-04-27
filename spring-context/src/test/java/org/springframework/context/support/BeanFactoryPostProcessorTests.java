@@ -57,6 +57,7 @@ public class BeanFactoryPostProcessorTests {
 		ac.registerSingleton("tb1", TestBean.class);
 		ac.registerSingleton("tb2", TestBean.class);
 		TestBeanFactoryPostProcessor bfpp = new TestBeanFactoryPostProcessor();
+		// 通过硬编码设置BeanFactoryPostProcessor
 		ac.addBeanFactoryPostProcessor(bfpp);
 		assertFalse(bfpp.wasCalled);
 		ac.refresh();
