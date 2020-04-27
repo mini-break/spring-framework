@@ -23,8 +23,15 @@ package org.springframework.expression;
  * @author Keith Donald
  * @author Andy Clement
  * @since 3.0
+ *
+ * 将表达式字符串解析为可计算的已编译表达式。支持分析模板（Template）和标准表达式字符串。
+ * 它是一个抽象，并没有要求具体的语法规则，Spring实现的语法规则是：SpEL语法
  */
 public interface ExpressionParser {
+
+	/**
+	 * 这俩个方法都是把字符串解析成一个Expression对象, expressionString都是可以被repeated evaluation的
+	 */
 
 	/**
 	 * Parse the expression string and return an Expression object you can use for repeated evaluation.

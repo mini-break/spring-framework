@@ -24,6 +24,8 @@ import java.util.EventObject;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ *
+ * Spring事件，继承了java EventObject
  */
 public abstract class ApplicationEvent extends EventObject {
 

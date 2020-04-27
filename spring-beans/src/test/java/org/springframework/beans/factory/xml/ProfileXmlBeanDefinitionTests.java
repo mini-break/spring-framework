@@ -69,7 +69,9 @@ public class ProfileXmlBeanDefinitionTests {
 
 	@Test
 	public void testProfilePermutations() {
+		// 没有激活任何剖面
 		assertThat(beanFactoryFor(PROD_ELIGIBLE_XML, NONE_ACTIVE), not(containsTargetBean()));
+		// 激活了dev剖面，但是配置文件中没有定义<beans profile="dev">
 		assertThat(beanFactoryFor(PROD_ELIGIBLE_XML, DEV_ACTIVE), not(containsTargetBean()));
 		assertThat(beanFactoryFor(PROD_ELIGIBLE_XML, PROD_ACTIVE), containsTargetBean());
 		assertThat(beanFactoryFor(PROD_ELIGIBLE_XML, MULTI_ACTIVE), containsTargetBean());

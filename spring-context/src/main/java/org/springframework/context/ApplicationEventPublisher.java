@@ -43,6 +43,10 @@ public interface ApplicationEventPublisher {
 	}
 
 	/**
+	 * 这个接口是Spring4.2后提供的，可以发布任意的事件对象（即使不是ApplicationEvent的子类了）
+	 * 当这个对象不是一个ApplicationEvent,我们会使用PayloadApplicationEvent来包装一下再发送
+	 * 比如后面会建讲到的@EventListener注解标注的类 就是使用的它
+	 *
 	 * Notify all <strong>matching</strong> listeners registered with this
 	 * application of an event.
 	 * <p>If the specified {@code event} is not an {@link ApplicationEvent},

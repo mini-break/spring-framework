@@ -27,6 +27,7 @@ package org.springframework.expression;
 public interface ParserContext {
 
 	/**
+	 * 是否是模版表达式。  比如：#{3 + 4}
 	 * Whether or not the expression being parsed is a template. A template expression
 	 * consists of literal text that can be mixed with evaluatable blocks. Some examples:
 	 * <pre class="code">
@@ -39,6 +40,7 @@ public interface ParserContext {
 	boolean isTemplate();
 
 	/**
+	 * 模版的前缀
 	 * For template expressions, returns the prefix that identifies the start of an
 	 * expression block within a string. For example: "${"
 	 * @return the prefix that identifies the start of an expression
@@ -46,6 +48,7 @@ public interface ParserContext {
 	String getExpressionPrefix();
 
 	/**
+	 * 模版的后缀
 	 * For template expressions, return the prefix that identifies the end of an
 	 * expression block within a string. For example: "}"
 	 * @return the suffix that identifies the end of an expression
@@ -54,6 +57,7 @@ public interface ParserContext {
 
 
 	/**
+	 * 默认提供的实例支持：#{} 的形式   显然我们可以改变它但我们一般并不需要这么去做
 	 * The default ParserContext implementation that enables template expression
 	 * parsing mode. The expression prefix is "#{" and the expression suffix is "}".
 	 * @see #isTemplate()

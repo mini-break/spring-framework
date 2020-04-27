@@ -62,8 +62,16 @@ import org.springframework.util.ObjectUtils;
 public abstract class AbstractApplicationEventMulticaster
 		implements ApplicationEventMulticaster, BeanClassLoaderAware, BeanFactoryAware {
 
+	/**
+	 * Retriever：猎犬
+	 * 它是一个内部类，内部持有applicationListeners和applicationListenerBeans的引用
+	 * 是一个类似包装的类
+	 */
 	private final ListenerRetriever defaultRetriever = new ListenerRetriever(false);
 
+	/**
+	 * 一个缓存：key由eventType, sourceType唯一确定
+	 */
 	final Map<ListenerCacheKey, ListenerRetriever> retrieverCache = new ConcurrentHashMap<>(64);
 
 	@Nullable
@@ -72,6 +80,9 @@ public abstract class AbstractApplicationEventMulticaster
 	@Nullable
 	private BeanFactory beanFactory;
 
+	/**
+	 * retrieval的互斥锁
+	 */
 	private Object retrievalMutex = this.defaultRetriever;
 
 
@@ -101,6 +112,11 @@ public abstract class AbstractApplicationEventMulticaster
 	}
 
 
+	/**
+	 * 向容器内注册一个监听器
+	 * 需要注意的是，添加进来的监听器都是保存到defaultRetriever里面的
+	 * 最后getApplicationListeners就是从这里拿的（注册进来多少  最终返回多少）
+	 */
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		synchronized (this.retrievalMutex) {
