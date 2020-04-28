@@ -48,19 +48,31 @@ import org.springframework.util.Assert;
  */
 public class SpelExpression implements Expression {
 
+	/**
+	 * 在编译表达式之前解释该表达式的次数
+	 */
 	// Number of times to interpret an expression before compiling it
 	private static final int INTERPRETED_COUNT_THRESHOLD = 100;
 
+	/**
+	 * 放弃前尝试编译表达式的次数
+	 */
 	// Number of times to try compiling an expression before giving up
 	private static final int FAILED_ATTEMPTS_THRESHOLD = 100;
 
 
 	private final String expression;
 
+	/**
+	 * 抽象语法树
+	 */
 	private final SpelNodeImpl ast;
 
 	private final SpelParserConfiguration configuration;
 
+	/**
+	 * 如果没有指定，就会用默认的上下文 new StandardEvaluationContext()
+	 */
 	// The default context is used if no override is supplied by the user
 	@Nullable
 	private EvaluationContext evaluationContext;
@@ -69,10 +81,12 @@ public class SpelExpression implements Expression {
 	@Nullable
 	private volatile CompiledExpression compiledAst;
 
+	// 表达式被解释的次数-达到某个限制时可以触发编译
 	// Count of many times as the expression been interpreted - can trigger compilation
 	// when certain limit reached
 	private final AtomicInteger interpretedCount = new AtomicInteger(0);
 
+	// 编译尝试和失败的次数——使我们最终放弃了在似乎不可能编译时尝试编译它的尝试
 	// The number of times compilation was attempted and failed - enables us to eventually
 	// give up trying to compile it when it just doesn't seem to be possible.
 	private final AtomicInteger failedAttempts = new AtomicInteger(0);
@@ -101,6 +115,7 @@ public class SpelExpression implements Expression {
 	 * @return the default evaluation context
 	 */
 	public EvaluationContext getEvaluationContext() {
+		// 若没有指定，这里会使用默认的StandardEvaluationContext上下文
 		if (this.evaluationContext == null) {
 			this.evaluationContext = new StandardEvaluationContext();
 		}
@@ -119,6 +134,7 @@ public class SpelExpression implements Expression {
 	@Nullable
 	public Object getValue() throws EvaluationException {
 		CompiledExpression compiledAst = this.compiledAst;
+		// 如果已经被编译过，就直接从编译后的里getValue即可
 		if (compiledAst != null) {
 			try {
 				EvaluationContext context = getEvaluationContext();
@@ -138,7 +154,9 @@ public class SpelExpression implements Expression {
 		}
 
 		ExpressionState expressionState = new ExpressionState(getEvaluationContext(), this.configuration);
+		// 比如此处SeEl是加法+，所以ast为：OpPlus语法树去处理的
 		Object result = this.ast.getValue(expressionState);
+		// 检查是否需要编译它
 		checkCompile(expressionState);
 		return result;
 	}

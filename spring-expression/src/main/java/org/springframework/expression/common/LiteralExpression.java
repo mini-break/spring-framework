@@ -32,6 +32,9 @@ import org.springframework.lang.Nullable;
  * @author Andy Clement
  * @author Juergen Hoeller
  * @since 3.0
+ *
+ * 它没有计算的活，只是表示字面意思（字面量）
+ * 所以，它里面处理的类型：全部为String.class，并且和EvaluationContext无关
  */
 public class LiteralExpression implements Expression {
 

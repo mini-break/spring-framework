@@ -84,20 +84,33 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @author Phillip Webb
  * @since 3.0
+ *
+ * Spring内部使用的类
  */
 class InternalSpelExpressionParser extends TemplateAwareExpressionParser {
 
 	private static final Pattern VALID_QUALIFIED_ID_PATTERN = Pattern.compile("[\\p{L}\\p{N}_$]+");
 
-
+	/**
+	 * SpEL的配置类
+	 */
 	private final SpelParserConfiguration configuration;
 
+	/**
+	 * 此处用一个双端队列来保存表达式的每一个节点，每个节点都是一个SpelNode，该对象记录着位置、子节点、父节点等等
+	 */
 	// For rules that build nodes, they are stacked here for return
 	private final Deque<SpelNodeImpl> constructedNodes = new ArrayDeque<>();
 
+	/**
+	 * 待解析的表达式字符串
+	 */
 	// The expression being parsed
 	private String expressionString = "";
 
+	/**
+	 * Token流：token保存着符号类型（如int(,]+=?>=等等各种符号 非常之多）  然后记录着它startPos和endPos
+	 */
 	// The token stream constructed from that expression string
 	private List<Token> tokenStream = Collections.emptyList();
 
@@ -123,10 +136,13 @@ class InternalSpelExpressionParser extends TemplateAwareExpressionParser {
 
 		try {
 			this.expressionString = expressionString;
+			// Tokenizer就是分词器。把待解析的表达式交给它分词
 			Tokenizer tokenizer = new Tokenizer(expressionString);
+			// process处理，得到tokenStream，并且记录上它的总长度，并且标记当前处理点为0
 			this.tokenStream = tokenizer.process();
 			this.tokenStreamLength = this.tokenStream.size();
 			this.tokenStreamPointer = 0;
+			// 把当前节点清空
 			this.constructedNodes.clear();
 			SpelNodeImpl ast = eatExpression();
 			Assert.state(ast != null, "No node");

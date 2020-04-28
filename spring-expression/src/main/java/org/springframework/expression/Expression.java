@@ -28,16 +28,20 @@ import org.springframework.lang.Nullable;
  * @author Andy Clement
  * @author Juergen Hoeller
  * @since 3.0
+ *
+ * 表示的是表达式对象，能够根据上下文对象对自身进行计算的表达式
  */
 public interface Expression {
 
 	/**
+	 * 返回原始表达式的字符串
 	 * Return the original string used to create this expression (unmodified).
 	 * @return the original expression string
 	 */
 	String getExpressionString();
 
 	/**
+	 * 使用一个默认的标准的context执行计算
 	 * Evaluate this expression in the default standard context.
 	 * @return the evaluation result
 	 * @throws EvaluationException if there is a problem during evaluation
@@ -46,6 +50,7 @@ public interface Expression {
 	Object getValue() throws EvaluationException;
 
 	/**
+	 * SpEL内部帮你转换，使用的是默认的context
 	 * Evaluate the expression in the default context. If the result
 	 * of the evaluation does not match (and cannot be converted to)
 	 * the expected result type then an exception will be returned.
@@ -57,6 +62,7 @@ public interface Expression {
 	<T> T getValue(@Nullable Class<T> desiredResultType) throws EvaluationException;
 
 	/**
+	 * 根据指定的根对象计算此表达式
 	 * Evaluate this expression against the specified root object.
 	 * @param rootObject the root object against which to evaluate the expression
 	 * @return the evaluation result
@@ -78,6 +84,7 @@ public interface Expression {
 	<T> T getValue(Object rootObject, @Nullable Class<T> desiredResultType) throws EvaluationException;
 
 	/**
+	 * 根据指定的上下文EvaluationContext来计算值
 	 * Evaluate this expression in the provided context and return the result
 	 * of evaluation.
 	 * @param context the context in which to evaluate the expression
@@ -88,6 +95,9 @@ public interface Expression {
 	Object getValue(EvaluationContext context) throws EvaluationException;
 
 	/**
+	 * 以rootObject作为表达式的root对象来计算表达式的值。
+	 * root对象：比如parser.parseExpression("name").getValue(person);
+	 * 相当于去person里拿到name属性的值。这个person就叫root对象
 	 * Evaluate this expression in the provided context and return the result
 	 * of evaluation, but use the supplied root context as an override for any
 	 * default root object specified in the context.

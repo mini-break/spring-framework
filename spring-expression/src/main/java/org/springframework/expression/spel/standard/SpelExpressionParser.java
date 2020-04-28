@@ -32,6 +32,9 @@ import org.springframework.util.Assert;
  */
 public class SpelExpressionParser extends TemplateAwareExpressionParser {
 
+	/**
+	 * SpEL的配置类
+	 */
 	private final SpelParserConfiguration configuration;
 
 
@@ -56,8 +59,12 @@ public class SpelExpressionParser extends TemplateAwareExpressionParser {
 		return doParseExpression(expressionString, null);
 	}
 
+	/**
+	 * 最终都是委托给了Spring的内部使用的类：InternalSpelExpressionParser(内部的SpEL表达式解析器)
+	 */
 	@Override
 	protected SpelExpression doParseExpression(String expressionString, @Nullable ParserContext context) throws ParseException {
+		// 因为是new的，所以每次都是一个新对象，所以它是线程安全的
 		return new InternalSpelExpressionParser(this.configuration).doParseExpression(expressionString, context);
 	}
 

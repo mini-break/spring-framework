@@ -88,6 +88,9 @@ public class StandardEvaluationContext implements EvaluationContext {
 
 	private OperatorOverloader operatorOverloader = new StandardOperatorOverloader();
 
+	/**
+	 * 上下文变量，就是一个Map
+	 */
 	private final Map<String, Object> variables = new ConcurrentHashMap<>();
 
 
@@ -112,6 +115,9 @@ public class StandardEvaluationContext implements EvaluationContext {
 		this.rootObject = new TypedValue(rootObject, typeDescriptor);
 	}
 
+	/**
+	 * 设置根对象
+	 */
 	public void setRootObject(@Nullable Object rootObject) {
 		this.rootObject = (rootObject != null ? new TypedValue(rootObject) : TypedValue.NULL);
 	}
@@ -228,6 +234,9 @@ public class StandardEvaluationContext implements EvaluationContext {
 		return this.operatorOverloader;
 	}
 
+	/**
+	 * 注册自定义变量
+	 */
 	@Override
 	public void setVariable(@Nullable String name, @Nullable Object value) {
 		// For backwards compatibility, we ignore null names here...
@@ -247,6 +256,9 @@ public class StandardEvaluationContext implements EvaluationContext {
 		variables.forEach(this::setVariable);
 	}
 
+	/**
+	 * 注册自定义函数
+	 */
 	public void registerFunction(String name, Method method) {
 		this.variables.put(name, method);
 	}

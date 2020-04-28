@@ -35,6 +35,8 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @author Andy Clement
  * @since 3.0
+ *
+ * 支持解析模版Template的解析器
  */
 public abstract class TemplateAwareExpressionParser implements ExpressionParser {
 
@@ -45,21 +47,25 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 
 	@Override
 	public Expression parseExpression(String expressionString, @Nullable ParserContext context) throws ParseException {
+		// 若指定了上下文，并且是模版 就走parseTemplate
 		if (context != null && context.isTemplate()) {
 			return parseTemplate(expressionString, context);
 		}
 		else {
+			// 抽象方法，由子类去实现
 			return doParseExpression(expressionString, context);
 		}
 	}
 
 
 	private Expression parseTemplate(String expressionString, ParserContext context) throws ParseException {
+		// 若解析字符串是空串
 		if (expressionString.isEmpty()) {
 			return new LiteralExpression("");
 		}
 
 		Expression[] expressions = parseExpressions(expressionString, context);
+		// 若只有一个模版表达式，直接返回。否则会返回一个CompositeStringExpression，聚合起来的表达式
 		if (expressions.length == 1) {
 			return expressions[0];
 		}

@@ -39,11 +39,16 @@ import org.springframework.lang.Nullable;
  * @author Andy Clement
  * @author Juergen Hoeller
  * @since 3.0
+ *
+ * 表示一个分为多个部分的模板表达式（它只处理Template模式）。每个部分都是表达式，但模板的纯文本部分将表示为LiteralExpression对象。显然它是一个聚合
  */
 public class CompositeStringExpression implements Expression {
 
 	private final String expressionString;
 
+	/**
+	 * 内部持有多个Expression
+	 */
 	/** The array of expressions that make up the composite expression */
 	private final Expression[] expressions;
 
@@ -63,6 +68,9 @@ public class CompositeStringExpression implements Expression {
 		return this.expressions;
 	}
 
+	/**
+	 * 它是把每个表达式的值都拼接起来了,因为它只会运用于Template模式
+	 */
 	@Override
 	public String getValue() throws EvaluationException {
 		StringBuilder sb = new StringBuilder();
