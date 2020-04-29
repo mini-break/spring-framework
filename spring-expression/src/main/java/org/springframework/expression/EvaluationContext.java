@@ -104,6 +104,7 @@ public interface EvaluationContext {
 	OperatorOverloader getOperatorOverloader();
 
 	/**
+	 * 估值上下文中设置变量
 	 * Set a named variable within this evaluation context to a specified value.
 	 * @param name variable to set
 	 * @param value value to be placed in the variable

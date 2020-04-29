@@ -32,6 +32,8 @@ import org.springframework.lang.Nullable;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @author Stephane Nicoll
+ *
+ * 广播，持有观察者集合，可向集合内的所有观察者通知事件
  */
 public interface ApplicationEventMulticaster {
 
@@ -68,7 +70,7 @@ public interface ApplicationEventMulticaster {
 	void removeAllListeners();
 
 	/**
-	 * 广播事件
+	 * 向所有监听者发布事件
 	 * Multicast the given application event to appropriate listeners.
 	 * <p>Consider using {@link #multicastEvent(ApplicationEvent, ResolvableType)}
 	 * if possible as it provides a better support for generics-based events.
