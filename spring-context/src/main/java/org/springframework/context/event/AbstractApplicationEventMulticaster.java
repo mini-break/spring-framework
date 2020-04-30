@@ -166,6 +166,7 @@ public abstract class AbstractApplicationEventMulticaster
 
 
 	/**
+	 * 获取所有监听器
 	 * Return a Collection containing all ApplicationListeners.
 	 * @return a Collection of ApplicationListeners
 	 * @see org.springframework.context.ApplicationListener
@@ -177,6 +178,7 @@ public abstract class AbstractApplicationEventMulticaster
 	}
 
 	/**
+	 * 获取所有类型匹配的监听器
 	 * Return a Collection of ApplicationListeners matching the given
 	 * event type. Non-matching listeners get excluded early.
 	 * @param event the event to be propagated. Allows for excluding
@@ -381,8 +383,14 @@ public abstract class AbstractApplicationEventMulticaster
 	 */
 	private class ListenerRetriever {
 
+		/**
+		 * 监听器集合
+		 */
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
+		/**
+		 * 监听器Name
+		 */
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
 		private final boolean preFiltered;
@@ -391,6 +399,9 @@ public abstract class AbstractApplicationEventMulticaster
 			this.preFiltered = preFiltered;
 		}
 
+		/**
+		 * 获得监听器集合
+		 */
 		public Collection<ApplicationListener<?>> getApplicationListeners() {
 			List<ApplicationListener<?>> allListeners = new ArrayList<>(
 					this.applicationListeners.size() + this.applicationListenerBeans.size());

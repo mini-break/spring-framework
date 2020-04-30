@@ -403,10 +403,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			this.earlyApplicationEvents.add(applicationEvent);
 		}
 		else {
+			// 获取事件广播器，发布事件
 			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
 		}
 
 		// Publish event via parent context as well...
+		// 如果存在父容器，那么父容器也发布事件
 		if (this.parent != null) {
 			if (this.parent instanceof AbstractApplicationContext) {
 				((AbstractApplicationContext) this.parent).publishEvent(event, eventType);
@@ -591,6 +593,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				/**
 				 * 10.在所有注册的bean中查找Listener bean,注册到消息广播器（派发器）中
+				 * （注意此处并不包括@EventListener标注的注解方法）
 				 */
 				// Check for listener beans and register them.
 				registerListeners();
@@ -773,7 +776,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 		/**
-		 * 这个 BeanPostProcessor 也很简单，在 bean 实例化后，如果是 ApplicationListener 的子类，
+		 * 这个 BeanPostProcessor 很重要，在 bean 实例化后，如果是 ApplicationListener 的子类，
 		 * 那么将其添加到 listener 列表中，可以理解成：注册事件监听器
 		 */
 		// Register early post-processor for detecting inner beans as ApplicationListeners.
@@ -952,18 +955,30 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void registerListeners() {
 		// Register statically specified listeners first.
+		// 遍历所有的监听器
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
+			/**
+			 * 将监听器添加到广播器中的ListenerRetriever里面的applicationListeners集合
+			 * 之后在finishRefresh中发布事件时，用于获取监听器集合
+			 */
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let post-processors apply to them!
+		// 得到所有监听器的Name
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
+		// 遍历所有的监听器Name
 		for (String listenerBeanName : listenerBeanNames) {
+			/**
+			 * 将监听器的名字添到广播器中的ListenerRetriever里面的applicationListenerBeans集合
+			 * 之后在finishRefresh中发布事件时，也是用于获取监听器集合
+			 */
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 
 		// Publish early application events now that we finally have a multicaster...
+		// 发布早期的事件，earlyApplicationEvents默认为空
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (earlyEventsToProcess != null) {
@@ -981,6 +996,29 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
+		/**
+		 * 如果用户自定义了conversionService(类型转换服务)，则设置到BeanFactory
+		 * 1．定义转换器
+		 * public class String2DateConverter implements Converter<String, Date> {
+		 *  @Override
+		 * 	public Date convert(String arg0) {
+		 * 		try {
+		 * 			return DateUtils.parseDate(arg0, new String[] { "yyyy-MM-dd HH:mm:ss" });
+		 * 		} catch (ParseException e) {
+		 * 			return null;
+		 * 		}
+		 * 	}
+		 * }
+		 * 2．注册
+		 * <bean id="conversionService"
+		 * class="org.Springframework.context.support.ConversionServiceFactoryBean">
+		 * 	<property name="converters">
+		 * 		<list>
+		 * 			<bean class="String2DateConverter" />
+		 * 		</list>
+		 * 	</property>
+		 * </bean>
+ 		 */
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -1014,7 +1052,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		/**
-		 * 开始初始化剩下的
+		 * 开始初始化非延时加载单例Bean
+		 * ApplicationContext 实现的默认行为就是在启动时将所有单例bean 提前进行实例化
 		 */
 		// Instantiate all remaining (non-lazy-init) singletons.
 		beanFactory.preInstantiateSingletons();
@@ -1036,6 +1075,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
+		// 发布事件
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.

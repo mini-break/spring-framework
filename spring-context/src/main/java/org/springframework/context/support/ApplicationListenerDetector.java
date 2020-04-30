@@ -56,6 +56,10 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 	}
 
 
+	/**
+	 * 这个方法会在merge Bean的定义信息时候执行，缓存下该Bean是否是单例Bean
+	 * 因为后面注册的时候：只有单例Bean才给注册为监听器
+	 */
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		this.singletonNames.put(beanName, beanDefinition.isSingleton());
@@ -71,11 +75,13 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 		if (bean instanceof ApplicationListener) {
 			// potentially not detected as a listener by getBeanNamesForType retrieval
 			Boolean flag = this.singletonNames.get(beanName);
+			// 只有单例Bean才会add进去
 			if (Boolean.TRUE.equals(flag)) {
 				// singleton bean (top-level or inner): register on the fly
 				this.applicationContext.addApplicationListener((ApplicationListener<?>) bean);
 			}
 			else if (Boolean.FALSE.equals(flag)) {
+				// 提示用户这个Bean实现了ApplicationListener  但是并不是单例的
 				if (logger.isWarnEnabled() && !this.applicationContext.containsBean(beanName)) {
 					// inner bean with other scope - can't reliably process events
 					logger.warn("Inner bean '" + beanName + "' implements ApplicationListener interface " +

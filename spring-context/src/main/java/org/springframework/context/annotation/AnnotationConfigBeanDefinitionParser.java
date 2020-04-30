@@ -36,6 +36,8 @@ import org.springframework.lang.Nullable;
  * @author Christian Dupuis
  * @since 2.5
  * @see AnnotationConfigUtils
+ *
+ * spring的bean配置有2种方式，一种是xml文件配置,一种是注解配置,spring通过本类解析注解并注册到ioc容器中
  */
 public class AnnotationConfigBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -45,6 +47,7 @@ public class AnnotationConfigBeanDefinitionParser implements BeanDefinitionParse
 		Object source = parserContext.extractSource(element);
 
 		// Obtain bean definitions for all relevant BeanPostProcessors.
+		// 注册注解相关BeanPostProcessor
 		Set<BeanDefinitionHolder> processorDefinitions =
 				AnnotationConfigUtils.registerAnnotationConfigProcessors(parserContext.getRegistry(), source);
 
