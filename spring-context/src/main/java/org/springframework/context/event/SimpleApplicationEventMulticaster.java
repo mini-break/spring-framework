@@ -129,13 +129,21 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 
 	@Override
 	public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
+		// 事件被统一封装成了ResolvableType，方便形参入口统一
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+		// 根据事件类型，通过泛形反射获取对应的监听者
 		for (final ApplicationListener<?> listener : getApplicationListeners(event, type)) {
+			// 获取广播配置的线程池
 			Executor executor = getTaskExecutor();
 			if (executor != null) {
+				/**
+				 * 如果有配置线程池，则异步通知事件监听者
+				 * 我们使用spring事件机制时，默认是没有配置线程池的，也就是默认所有的通知都是同步的，需要手动指定线程池才会开启同步。
+ 				 */
 				executor.execute(() -> invokeListener(listener, event));
 			}
 			else {
+				// 没有配置线程池，同步通知事件监听者
 				invokeListener(listener, event);
 			}
 		}
@@ -169,6 +177,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private void doInvokeListener(ApplicationListener listener, ApplicationEvent event) {
 		try {
+			// 执行监听者对应逻辑
 			listener.onApplicationEvent(event);
 		}
 		catch (ClassCastException ex) {
