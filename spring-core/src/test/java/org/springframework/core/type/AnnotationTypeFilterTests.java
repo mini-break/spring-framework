@@ -43,6 +43,7 @@ public class AnnotationTypeFilterTests {
 
 		AnnotationTypeFilter filter = new AnnotationTypeFilter(InheritedAnnotation.class);
 		assertTrue(filter.match(metadataReader, metadataReaderFactory));
+		// 类未加载
 		ClassloadingAssertions.assertClassNotLoaded(classUnderTest);
 	}
 

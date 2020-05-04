@@ -27,37 +27,47 @@ import org.springframework.lang.Nullable;
  * @see StandardClassMetadata
  * @see org.springframework.core.type.classreading.MetadataReader#getClassMetadata()
  * @see AnnotationMetadata
+ *
+ * 类元数据模型在包org.springframework.core.type下，是spring对class文件的描述单元，
+ * 包含ClassMetadata(提供对class类的信息访问)，MethodMetadata，AnnotationMetadata等元数据，都是对外提供对class属性的访问，
+ * 同时这些元数据是通过ASM字节码框架解析字节码获取生成。
  */
 public interface ClassMetadata {
 
 	/**
+	 * 返回当前class名称
 	 * Return the name of the underlying class.
 	 */
 	String getClassName();
 
 	/**
+	 * 返回当前class是否为接口
 	 * Return whether the underlying class represents an interface.
 	 */
 	boolean isInterface();
 
 	/**
+	 * 返回当前class是否为注解
 	 * Return whether the underlying class represents an annotation.
 	 * @since 4.1
 	 */
 	boolean isAnnotation();
 
 	/**
+	 * 返回当前class是否为抽象类
 	 * Return whether the underlying class is marked as abstract.
 	 */
 	boolean isAbstract();
 
 	/**
+	 * 返回当前类是否为实现类（非接口、非抽象类）
 	 * Return whether the underlying class represents a concrete class,
 	 * i.e. neither an interface nor an abstract class.
 	 */
 	boolean isConcrete();
 
 	/**
+	 * 返回当前class是否为final修饰
 	 * Return whether the underlying class is marked as 'final'.
 	 */
 	boolean isFinal();

@@ -88,6 +88,10 @@ import org.springframework.util.Assert;
  * @see #refresh()
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
+ *
+ * GenericApplicationContext不是比较常用的ApplicationContext实现，但是更具灵活性，可以任意配置读取路径和DefinitionReader，
+ * 它不预设指定任何bean定义格式; 例如XML或注释
+ *
  */
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
 

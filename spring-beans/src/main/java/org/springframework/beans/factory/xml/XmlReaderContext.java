@@ -34,6 +34,8 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
 /**
+ * xml配置文件中的Bean读取上下文
+ *
  * Extension of {@link org.springframework.beans.factory.parsing.ReaderContext},
  * specific to use with an {@link XmlBeanDefinitionReader}. Provides access to the
  * {@link NamespaceHandlerResolver} configured in the {@link XmlBeanDefinitionReader}.
@@ -44,8 +46,14 @@ import org.springframework.lang.Nullable;
  */
 public class XmlReaderContext extends ReaderContext {
 
+	/**
+	 * xml配置文件读取器
+	 */
 	private final XmlBeanDefinitionReader reader;
 
+	/**
+	 * 命名空间解析器
+	 */
 	private final NamespaceHandlerResolver namespaceHandlerResolver;
 
 

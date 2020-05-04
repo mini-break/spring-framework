@@ -51,6 +51,9 @@ public class ClassPathBeanDefinitionScannerTests {
 	private static final String BASE_PACKAGE = "example.scannable";
 
 
+	/**
+	 * 扫描时使用默认过滤器和BeanPostProcessor
+	 */
 	@Test
 	public void testSimpleScanWithDefaultFiltersAndPostProcessors() {
 		GenericApplicationContext context = new GenericApplicationContext();

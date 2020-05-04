@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.parsing;
 
 /**
+ * service provider interface:内置的服务发现机制（一般是通过反射去获取服务）
  * SPI interface allowing tools and other external processes to handle errors
  * and warnings reported during bean definition parsing.
  *

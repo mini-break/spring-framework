@@ -37,20 +37,36 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @author Costin Leau
  * @since 2.5
+ *
+ * SimpleMetadataReader 为MetadataReader的默认实现，在创建SimpleMetadataReader通过ASM字节码操控框架读取class读取class资源流生成classMetadata与annotationMetadata
  */
 final class SimpleMetadataReader implements MetadataReader {
 
+	/**
+	 * class类IO流资源引用
+	 */
 	private final Resource resource;
 
+	/**
+	 * class类元数据
+	 */
 	private final ClassMetadata classMetadata;
 
+	/**
+	 * class类完整注释元数据
+	 */
 	private final AnnotationMetadata annotationMetadata;
 
 
+	/**
+	 * 构建函数，用于通过过ASM字节码操作框架读取class读取class资源流
+	 */
 	SimpleMetadataReader(Resource resource, @Nullable ClassLoader classLoader) throws IOException {
+		// 获取class类IO流
 		InputStream is = new BufferedInputStream(resource.getInputStream());
 		ClassReader classReader;
 		try {
+			// 通过ASM字节码操作框架读取class
 			classReader = new ClassReader(is);
 		}
 		catch (IllegalArgumentException ex) {
@@ -61,11 +77,14 @@ final class SimpleMetadataReader implements MetadataReader {
 			is.close();
 		}
 
+		// 注解元数据读取访问者读取注解元数据
 		AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
 		classReader.accept(visitor, ClassReader.SKIP_DEBUG);
 
+		// 注解元数据
 		this.annotationMetadata = visitor;
 		// (since AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor)
+		// class元数据
 		this.classMetadata = visitor;
 		this.resource = resource;
 	}

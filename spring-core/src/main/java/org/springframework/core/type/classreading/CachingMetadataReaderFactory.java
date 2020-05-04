@@ -37,9 +37,15 @@ import org.springframework.lang.Nullable;
  */
 public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 
+	/**
+	 * 默认的缓存大小
+	 */
 	/** Default maximum number of entries for a local MetadataReader cache: 256 */
 	public static final int DEFAULT_CACHE_LIMIT = 256;
 
+	/**
+	 * 内存缓存列表，Resource-MetadataReader的映射缓存
+	 */
 	/** MetadataReader cache: either local or shared at the ResourceLoader level */
 	@Nullable
 	private Map<Resource, MetadataReader> metadataReaderCache;
@@ -121,6 +127,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 			MetadataReader metadataReader = this.metadataReaderCache.get(resource);
 			if (metadataReader == null) {
 				metadataReader = super.getMetadataReader(resource);
+				// 缓存到本地缓存
 				this.metadataReaderCache.put(resource, metadataReader);
 			}
 			return metadataReader;
@@ -130,6 +137,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 				MetadataReader metadataReader = this.metadataReaderCache.get(resource);
 				if (metadataReader == null) {
 					metadataReader = super.getMetadataReader(resource);
+					// 缓存到本地缓存
 					this.metadataReaderCache.put(resource, metadataReader);
 				}
 				return metadataReader;

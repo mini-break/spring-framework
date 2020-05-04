@@ -184,6 +184,7 @@ public class ComponentScanParserTests {
 		 */
 		@Override
 		public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) {
+			// 类名中包含“Kustom”
 			return metadataReader.getClassMetadata().getClassName().contains("Kustom");
 		}
 	}

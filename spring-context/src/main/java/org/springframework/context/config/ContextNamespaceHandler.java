@@ -38,6 +38,9 @@ public class ContextNamespaceHandler extends NamespaceHandlerSupport {
 		 * <context:annotation-config/> 元素名称空间解析器
 		 */
 		registerBeanDefinitionParser("annotation-config", new AnnotationConfigBeanDefinitionParser());
+		/**
+		 * <context:component-scan base-package="xxx"/> 元素名称空间解析器
+		 */
 		registerBeanDefinitionParser("component-scan", new ComponentScanBeanDefinitionParser());
 		registerBeanDefinitionParser("load-time-weaver", new LoadTimeWeaverBeanDefinitionParser());
 		registerBeanDefinitionParser("spring-configured", new SpringConfiguredBeanDefinitionParser());

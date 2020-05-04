@@ -20,6 +20,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 /**
+ * 一个bean读取过程的上下文
+ *
  * Context that gets passed along a bean definition reading process,
  * encapsulating all relevant configuration as well as state.
  *
@@ -29,12 +31,24 @@ import org.springframework.lang.Nullable;
  */
 public class ReaderContext {
 
+	/**
+	 * 资源
+	 */
 	private final Resource resource;
 
+	/**
+	 * 读取过程中问题日志
+	 */
 	private final ProblemReporter problemReporter;
 
+	/**
+	 * 事件监听
+	 */
 	private final ReaderEventListener eventListener;
 
+	/**
+	 * 资源提取器
+	 */
 	private final SourceExtractor sourceExtractor;
 
 
