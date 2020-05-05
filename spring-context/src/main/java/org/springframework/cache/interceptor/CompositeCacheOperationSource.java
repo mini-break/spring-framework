@@ -31,10 +31,14 @@ import org.springframework.util.Assert;
  * @author Costin Leau
  * @author Juergen Hoeller
  * @since 3.1
+ * 组合模式：所以组合进取的属性源，最终都会叠加生效
  */
 @SuppressWarnings("serial")
 public class CompositeCacheOperationSource implements CacheOperationSource, Serializable {
 
+	/**
+	 * 这里用的数组，表面只能赋值一次  并且只能通过构造函数赋值
+	 */
 	private final CacheOperationSource[] cacheOperationSources;
 
 

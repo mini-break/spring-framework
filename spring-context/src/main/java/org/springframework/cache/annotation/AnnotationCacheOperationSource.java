@@ -47,12 +47,17 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperationSource implements Serializable {
 
+	/**
+	 * 是否只允许此注解标注在public方法上，下面有设置值为true
+	 * 该属性只能通过构造函数赋值
+	 */
 	private final boolean publicMethodsOnly;
 
 	private final Set<CacheAnnotationParser> annotationParsers;
 
 
 	/**
+	 * 默认就设置了publicMethodsOnly=true
 	 * Create a default AnnotationCacheOperationSource, supporting public methods
 	 * that carry the {@code Cacheable} and {@code CacheEvict} annotations.
 	 */
@@ -73,6 +78,7 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	}
 
 	/**
+	 * 也可以自己来实现注解的解析器。（比如我们要做自定义注解的话，可以这么搞）
 	 * Create a custom AnnotationCacheOperationSource.
 	 * @param annotationParser the CacheAnnotationParser to use
 	 */
@@ -106,16 +112,19 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	@Override
 	@Nullable
 	protected Collection<CacheOperation> findCacheOperations(Class<?> clazz) {
+		// 核心事件都交给了CacheAnnotationParser.parseCacheAnnotations方法
 		return determineCacheOperations(parser -> parser.parseCacheAnnotations(clazz));
 	}
 
 	@Override
 	@Nullable
 	protected Collection<CacheOperation> findCacheOperations(Method method) {
+		// 核心事件都交给了CacheAnnotationParser.parseCacheAnnotations方法
 		return determineCacheOperations(parser -> parser.parseCacheAnnotations(method));
 	}
 
 	/**
+	 * CacheOperationProvider就是一个函数式接口，类似Function
 	 * Determine the cache operation(s) for the given {@link CacheOperationProvider}.
 	 * <p>This implementation delegates to configured
 	 * {@link CacheAnnotationParser CacheAnnotationParsers}
@@ -127,8 +136,12 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	@Nullable
 	protected Collection<CacheOperation> determineCacheOperations(CacheOperationProvider provider) {
 		Collection<CacheOperation> ops = null;
+		/**
+		 * 调用我们设置进来的所有的CacheAnnotationParser一个一个的处理
+		 */
 		for (CacheAnnotationParser annotationParser : this.annotationParsers) {
 			Collection<CacheOperation> annOps = provider.getCacheOperations(annotationParser);
+			// 理解这一块：说明我们方法上、类上是可以标注N个注解的，都会同时生效，最后都会combined
 			if (annOps != null) {
 				if (ops == null) {
 					ops = annOps;

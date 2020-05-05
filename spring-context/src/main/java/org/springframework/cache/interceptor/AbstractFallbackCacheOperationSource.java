@@ -49,6 +49,8 @@ import org.springframework.util.ClassUtils;
  * @author Costin Leau
  * @author Juergen Hoeller
  * @since 3.1
+ *
+ * 这个抽象方法主要目的是：让缓存注解（当然此抽象类并不要求一定是注解，别的方式也成）既能使用在类上，也能使用在方法上。方法上没找到，就Fallback到类上去找
  */
 public abstract class AbstractFallbackCacheOperationSource implements CacheOperationSource {
 
@@ -67,6 +69,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
+	 * 缓存所有的Method
 	 * Cache of CacheOperations, keyed by method on a specific target class.
 	 * <p>As this base class is not marked Serializable, the cache will be recreated
 	 * after serialization - provided that the concrete subclass is Serializable.
@@ -85,10 +88,12 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	@Override
 	@Nullable
 	public Collection<CacheOperation> getCacheOperations(Method method, @Nullable Class<?> targetClass) {
+		// 当前Method对象所属的Class为Object，那就不考虑缓存操作
 		if (method.getDeclaringClass() == Object.class) {
 			return null;
 		}
 
+		// 以method和Class作为上面缓存Map的key
 		Object cacheKey = getCacheKey(method, targetClass);
 		Collection<CacheOperation> cached = this.attributeCache.get(cacheKey);
 
@@ -96,6 +101,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 			return (cached != NULL_CACHING_ATTRIBUTE ? cached : null);
 		}
 		else {
+			// computeCacheOperations计算缓存属性，这个方法是本类的灵魂
 			Collection<CacheOperation> cacheOps = computeCacheOperations(method, targetClass);
 			if (cacheOps != null) {
 				if (logger.isDebugEnabled()) {
@@ -104,6 +110,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 				this.attributeCache.put(cacheKey, cacheOps);
 			}
 			else {
+				// 若没有标注属性的方法，用NULL_CACHING_ATTRIBUTE占位， 不用null值，Spring内部大都不直接使用null
 				this.attributeCache.put(cacheKey, NULL_CACHING_ATTRIBUTE);
 			}
 			return cacheOps;
@@ -124,6 +131,10 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 
 	@Nullable
 	private Collection<CacheOperation> computeCacheOperations(Method method, @Nullable Class<?> targetClass) {
+		/**
+		 * allowPublicMethodsOnly()默认是false（子类复写后的默认值已经写为true了）
+		 * 也就是说：缓存注解只能标注在public方法上,不接收别非public方法
+		 */
 		// Don't allow no-public methods as required.
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
 			return null;
@@ -133,18 +144,29 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		// If the target class is null, the method will be unchanged.
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
+		/**
+		 * 第一步：先去该方法上找，看看有没有啥缓存属性，有就返回
+		 */
 		// First try is the method in the target class.
 		Collection<CacheOperation> opDef = findCacheOperations(specificMethod);
 		if (opDef != null) {
 			return opDef;
 		}
 
+		/**
+		 * 第二步：方法上没有，就再去方法所在的类上去找。
+		 * isUserLevelMethod：我们自己书写的方法（非自动生成的） 才直接return，否则继续处理
+		 */
 		// Second try is the caching operation on the target class.
 		opDef = findCacheOperations(specificMethod.getDeclaringClass());
 		if (opDef != null && ClassUtils.isUserLevelMethod(method)) {
 			return opDef;
 		}
 
+		/**
+		 * 他俩不相等，说明method这个方法它是标注在接口上的，这里也给与了支持
+		 * 此处透露的性息：我们的缓存注解也可以标注在接口方法上，比如MyBatis的接口上都是ok的
+		 */
 		if (specificMethod != method) {
 			// Fallback is to look at the original method.
 			opDef = findCacheOperations(method);

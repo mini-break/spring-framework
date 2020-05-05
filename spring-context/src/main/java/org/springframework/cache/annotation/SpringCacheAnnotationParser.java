@@ -47,6 +47,12 @@ import org.springframework.util.StringUtils;
 @SuppressWarnings("serial")
 public class SpringCacheAnnotationParser implements CacheAnnotationParser, Serializable {
 
+	/**
+	 * 处理class和Method
+	 * 使用DefaultCacheConfig，把它传给parseCacheAnnotations()  来给注解属性搞定默认值
+	 * 至于为何自己要新new一个呢？其实是因为@CacheConfig它只能放在类上（传Method也能获取到类）
+	 * 返回值都可以为null（没有标注此注解方法、类  那肯定返回null啊）
+	 */
 	@Override
 	@Nullable
 	public Collection<CacheOperation> parseCacheAnnotations(Class<?> type) {
@@ -61,9 +67,14 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		return parseCacheAnnotations(defaultConfig, method);
 	}
 
+	/**
+	 * 找到方法/类上的注解们
+	 */
 	@Nullable
 	private Collection<CacheOperation> parseCacheAnnotations(DefaultCacheConfig cachingConfig, AnnotatedElement ae) {
+		// 第三个参数传的false：表示接口的注解它也会看一下
 		Collection<CacheOperation> ops = parseCacheAnnotations(cachingConfig, ae, false);
+		// 若出现接口方法里也标了，实例方法里也标了，那就继续处理。让以实例方法里标注的为准
 		if (ops != null && ops.size() > 1 && ae.getAnnotations().length > 0) {
 			// More than one operation found -> local declarations override interface-declared ones...
 			Collection<CacheOperation> localOps = parseCacheAnnotations(cachingConfig, ae, true);
@@ -80,6 +91,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 
 		Collection<CacheOperation> ops = null;
 
+		// localOnly=true，只看自己的不看接口的。false表示接口的也得看
 		Collection<Cacheable> cacheables = (localOnly ? AnnotatedElementUtils.getAllMergedAnnotations(ae, Cacheable.class) :
 				AnnotatedElementUtils.findAllMergedAnnotations(ae, Cacheable.class));
 		if (!cacheables.isEmpty()) {
@@ -123,10 +135,12 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 	}
 
 	private <T extends Annotation> Collection<CacheOperation> lazyInit(@Nullable Collection<CacheOperation> ops) {
+		// 这里为何写个1，因为绝大多数情况下，我们都只会标注一个注解
 		return (ops != null ? ops : new ArrayList<>(1));
 	}
 
 	CacheableOperation parseCacheableAnnotation(AnnotatedElement ae, DefaultCacheConfig defaultConfig, Cacheable cacheable) {
+		// 这个builder是CacheOperation.Builder的子类，父类规定了所有注解通用的一些属性
 		CacheableOperation.Builder builder = new CacheableOperation.Builder();
 
 		builder.setName(ae.toString());
@@ -139,8 +153,10 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		builder.setCacheResolver(cacheable.cacheResolver());
 		builder.setSync(cacheable.sync());
 
+		// DefaultCacheConfig是本类的一个内部类，来处理buider，给他赋值默认值，比如默认的keyGenerator等等
 		defaultConfig.applyDefault(builder);
 		CacheableOperation op = builder.build();
+		// 校验。key和KeyGenerator至少得有一个，CacheManager和CacheResolver至少得配置一个
 		validateCacheOperation(ae, op);
 
 		return op;
@@ -188,6 +204,10 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 	@Nullable
 	Collection<CacheOperation> parseCachingAnnotation(AnnotatedElement ae, DefaultCacheConfig defaultConfig, Caching caching) {
 		Collection<CacheOperation> ops = null;
+
+		/**
+		 * 这里的方法parseCacheableAnnotation/parsePutAnnotation等 说白了  就是把注解属性，转换封装成为`CacheOperation`对象
+		 */
 
 		Cacheable[] cacheables = caching.cacheable();
 		if (!ObjectUtils.isEmpty(cacheables)) {
@@ -264,6 +284,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 
 
 	/**
+	 * 设置默认值的私有静态内部类
 	 * Provides default settings for a given set of cache operations.
 	 */
 	static class DefaultCacheConfig {
