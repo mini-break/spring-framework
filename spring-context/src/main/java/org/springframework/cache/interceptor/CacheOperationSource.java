@@ -29,7 +29,7 @@ import org.springframework.lang.Nullable;
  * @author Costin Leau
  * @author Juergen Hoeller
  * @since 3.1
- * 缓存属性源
+ * 缓存属性源:该接口被CacheInterceptor使用。它能够获取到Method上所有的缓存操作集合
  */
 public interface CacheOperationSource {
 

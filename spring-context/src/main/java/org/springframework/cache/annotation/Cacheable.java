@@ -106,6 +106,7 @@ public @interface Cacheable {
 	String keyGenerator() default "";
 
 	/**
+	 * 它和cacheResolver互斥，只能使用其中一个
 	 * The bean name of the custom {@link org.springframework.cache.CacheManager} to use to
 	 * create a default {@link org.springframework.cache.interceptor.CacheResolver} if none
 	 * is set already.

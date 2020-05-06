@@ -27,11 +27,16 @@ import org.springframework.cache.Cache;
  *
  * @author Stephane Nicoll
  * @since 4.1
+ *
+ * Cache解析器，用于根据实际情况来动态解析使用哪个Cache
  */
 @FunctionalInterface
 public interface CacheResolver {
 
 	/**
+	 * 根据执行上下文，拿到最终的缓存Cache集合
+	 * CacheOperationInvocationContext：执行上下文
+	 *
 	 * Return the cache(s) to use for the specified invocation.
 	 * @param context the context of the particular invocation
 	 * @return the cache(s) to use (never {@code null})

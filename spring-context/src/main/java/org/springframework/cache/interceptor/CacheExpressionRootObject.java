@@ -27,6 +27,8 @@ import org.springframework.cache.Cache;
  * @author Costin Leau
  * @author Sam Brannen
  * @since 3.1
+ *
+ * #root可取的值
  */
 class CacheExpressionRootObject {
 

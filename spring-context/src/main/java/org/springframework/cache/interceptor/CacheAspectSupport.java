@@ -658,6 +658,12 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	 */
 	protected class CacheOperationContext implements CacheOperationInvocationContext<CacheOperation> {
 
+		/**
+		 * 它里面包含了CacheOperation、Method、Class、Method targetMethod;(注意有两个Method)、AnnotatedElementKey、KeyGenerator、CacheResolver等属性
+		 * this.method = BridgeMethodResolver.findBridgedMethod(method);
+		 * this.targetMethod = (!Proxy.isProxyClass(targetClass) ? AopUtils.getMostSpecificMethod(method, targetClass)  : this.method);
+		 * this.methodKey = new AnnotatedElementKey(this.targetMethod, targetClass);
+		 */
 		private final CacheOperationMetadata metadata;
 
 		private final Object[] args;
@@ -672,7 +678,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			this.metadata = metadata;
 			this.args = extractArgs(metadata.method, args);
 			this.target = target;
+			// 这里方法里调用了cacheResolver.resolveCaches(context)方法来得到缓存们
 			this.caches = CacheAspectSupport.this.getCaches(this, metadata.cacheResolver);
+			// 从caches拿到他们的names们
 			this.cacheNames = createCacheNames(this.caches);
 		}
 
@@ -709,6 +717,11 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 		protected boolean isConditionPassing(@Nullable Object result) {
 			if (StringUtils.hasText(this.metadata.operation.getCondition())) {
+				/**
+				 *  执行上下文：此处就不得不提一个非常重要的它了：CacheOperationExpressionEvaluator
+				 * 	它代表着缓存操作中SpEL的执行上下文, 具体可以先参与下面的对它的介绍
+				 * 	解析condition
+				 */
 				EvaluationContext evaluationContext = createEvaluationContext(result);
 				return evaluator.condition(this.metadata.operation.getCondition(),
 						this.metadata.methodKey, evaluationContext);
@@ -716,6 +729,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			return true;
 		}
 
+		/**
+		 * 解析CacheableOperation和CachePutOperation的unless
+		 */
 		protected boolean canPutToCache(@Nullable Object value) {
 			String unless = "";
 			if (this.metadata.operation instanceof CacheableOperation) {
@@ -732,6 +748,12 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		}
 
 		/**
+		 * 这里注意：生成key  需要注意步骤。
+		 * 若配置了key（非空串）：那就作为SpEL解析出来
+		 * 否则走keyGenerator去生成（所以你会发现，即使咱们没有配置key和keyGenerator，程序依旧能正常work,只是生成的key很长而已~~~）
+		 * （keyGenerator你可以能没配置？）
+		 * 若你自己没有手动指定过KeyGenerator，那会使用默认的SimpleKeyGenerator 它的实现比较简单
+		 * 其实若我们自定义KeyGenerator，我觉得可以继承自`SimpleKeyGenerator `，而不是直接实现接口
 		 * Compute the key for the given caching operation.
 		 */
 		@Nullable
@@ -740,6 +762,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 				EvaluationContext evaluationContext = createEvaluationContext(result);
 				return evaluator.key(this.metadata.operation.getKey(), this.metadata.methodKey, evaluationContext);
 			}
+			// key的优先级第一位，没有指定则采用生成器去生成
 			return this.metadata.keyGenerator.generate(this.target, this.metadata.method, this.args);
 		}
 

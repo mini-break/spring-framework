@@ -34,9 +34,14 @@ import org.springframework.util.Assert;
  * @author Stephane Nicoll
  * @author Juergen Hoeller
  * @since 4.1
+ *
+ * 具体实现根据调用上下文提供缓存名称集合(实现了InitializingBean)
  */
 public abstract class AbstractCacheResolver implements CacheResolver, InitializingBean {
 
+	/**
+	 * 依赖于CacheManager
+	 */
 	@Nullable
 	private CacheManager cacheManager;
 
@@ -74,16 +79,22 @@ public abstract class AbstractCacheResolver implements CacheResolver, Initializi
 
 	@Override
 	public void afterPropertiesSet()  {
+		/**
+		 * 做了一步校验而已,CacheManager 必须存在
+		 * 这是一个使用技巧哦   自己的在设计框架的框架的时候可以使用
+		 */
 		Assert.notNull(this.cacheManager, "CacheManager is required");
 	}
 
 
 	@Override
 	public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> context) {
+		// getCacheNames抽象方法，子类去实现
 		Collection<String> cacheNames = getCacheNames(context);
 		if (cacheNames == null) {
 			return Collections.emptyList();
 		}
+		// 根据cacheNames  去CacheManager里面拿到Cache对象， 作为最终的返回
 		Collection<Cache> result = new ArrayList<>(cacheNames.size());
 		for (String cacheName : cacheNames) {
 			Cache cache = getCacheManager().getCache(cacheName);

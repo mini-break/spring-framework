@@ -42,6 +42,8 @@ import org.springframework.lang.Nullable;
  * @author Sam Brannen
  * @author Stephane Nicoll
  * @since 3.1
+ *
+ * 缓存操作执行器
  */
 class CacheOperationExpressionEvaluator extends CachedExpressionEvaluator {
 
@@ -69,6 +71,8 @@ class CacheOperationExpressionEvaluator extends CachedExpressionEvaluator {
 
 
 	/**
+	 * 这个方法是创建执行上下文。能给解释：为何可以使用#result这个key的原因
+	 *
 	 * Create an {@link EvaluationContext}.
 	 * @param caches the current caches
 	 * @param method the method
@@ -83,27 +87,37 @@ class CacheOperationExpressionEvaluator extends CachedExpressionEvaluator {
 			Method method, Object[] args, Object target, Class<?> targetClass, Method targetMethod,
 			@Nullable Object result, @Nullable BeanFactory beanFactory) {
 
+		// root对象，此对象的属性决定了你的#root能够取值的范围
 		CacheExpressionRootObject rootObject = new CacheExpressionRootObject(
 				caches, method, args, target, targetClass);
+		// 它继承自MethodBasedEvaluationContext
 		CacheEvaluationContext evaluationContext = new CacheEvaluationContext(
 				rootObject, targetMethod, args, getParameterNameDiscoverer());
 		if (result == RESULT_UNAVAILABLE) {
 			evaluationContext.addUnavailableVariable(RESULT_VARIABLE);
 		}
 		else if (result != NO_RESULT) {
+			// 这一句话就是为何我们可以使用#result的核心原因
 			evaluationContext.setVariable(RESULT_VARIABLE, result);
 		}
+		// 从这里可知，缓存注解里也是可以使用容器内的Bean的
 		if (beanFactory != null) {
 			evaluationContext.setBeanResolver(new BeanFactoryResolver(beanFactory));
 		}
 		return evaluationContext;
 	}
 
+	/**
+	 * 解析key的SpEL表达式
+	 */
 	@Nullable
 	public Object key(String keyExpression, AnnotatedElementKey methodKey, EvaluationContext evalContext) {
 		return getExpression(this.keyCache, methodKey, keyExpression).getValue(evalContext);
 	}
 
+	/**
+	 * condition和unless的解析结果若不是bool类型，统一按照false处理
+	 */
 	public boolean condition(String conditionExpression, AnnotatedElementKey methodKey, EvaluationContext evalContext) {
 		return (Boolean.TRUE.equals(getExpression(this.conditionCache, methodKey, conditionExpression).getValue(
 				evalContext, Boolean.class)));

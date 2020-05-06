@@ -26,25 +26,32 @@ import java.lang.reflect.Method;
  *
  * @author Stephane Nicoll
  * @since 4.1
+ *
+ * 缓存执行时的上下文
+ * 注意泛型O extends BasicOperation
  */
 public interface CacheOperationInvocationContext<O extends BasicOperation> {
 
 	/**
+	 * 	获取缓存操作属性CacheOperation
 	 * Return the cache operation.
 	 */
 	O getOperation();
 
 	/**
+	 * 目标类
 	 * Return the target instance on which the method was invoked.
 	 */
 	Object getTarget();
 
 	/**
+	 * 目标方法
 	 * Return the method which was invoked.
 	 */
 	Method getMethod();
 
 	/**
+	 * 方法入参
 	 * Return the argument list used to invoke the method.
 	 */
 	Object[] getArgs();

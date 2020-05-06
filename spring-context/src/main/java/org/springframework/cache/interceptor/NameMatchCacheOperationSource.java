@@ -35,6 +35,8 @@ import org.springframework.util.PatternMatchUtils;
  *
  * @author Costin Leau
  * @since 3.1
+ *
+ * 根据方法名称来匹配作用在此方法上的缓存操作有哪些
  */
 @SuppressWarnings("serial")
 public class NameMatchCacheOperationSource implements CacheOperationSource, Serializable {
@@ -51,6 +53,9 @@ public class NameMatchCacheOperationSource implements CacheOperationSource, Seri
 
 
 	/**
+	 * 配置的时候，可以调用此方法。这里使用的也是add方法
+	 * 先拦截这个方法，然后看看这个方法有木有匹配的缓存操作，有点想AOP的配置
+	 *
 	 * Set a name/attribute map, consisting of method names
 	 * (e.g. "myMethod") and CacheOperation instances
 	 * (or Strings to be converted to CacheOperation instances).
@@ -84,7 +89,13 @@ public class NameMatchCacheOperationSource implements CacheOperationSource, Seri
 		if (ops == null) {
 			// Look for most specific name match.
 			String bestNameMatch = null;
+			// 遍历所有外部已经制定进来了的方法名
 			for (String mappedName : this.nameMap.keySet()) {
+				/**
+				 * isMatch就是Ant风格匹配
+				 * 第一步：光Ant匹配上了还不算
+				 * 第二步：bestNameMatch=null或者
+				 */
 				if (isMatch(methodName, mappedName)
 						&& (bestNameMatch == null || bestNameMatch.length() <= mappedName.length())) {
 					ops = this.nameMap.get(mappedName);

@@ -53,6 +53,9 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	 */
 	private final boolean publicMethodsOnly;
 
+	/**
+	 * 缓存注解解析器
+	 */
 	private final Set<CacheAnnotationParser> annotationParsers;
 
 
@@ -74,6 +77,7 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	 */
 	public AnnotationCacheOperationSource(boolean publicMethodsOnly) {
 		this.publicMethodsOnly = publicMethodsOnly;
+		// 初始化一个缓存注解解析器(SpringCacheAnnotationParser)
 		this.annotationParsers = Collections.singleton(new SpringCacheAnnotationParser());
 	}
 

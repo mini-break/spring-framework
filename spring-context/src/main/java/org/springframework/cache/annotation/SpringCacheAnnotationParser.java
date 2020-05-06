@@ -139,6 +139,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		return (ops != null ? ops : new ArrayList<>(1));
 	}
 
+	// CacheableOperation是抽象类CacheOperation的子类
 	CacheableOperation parseCacheableAnnotation(AnnotatedElement ae, DefaultCacheConfig defaultConfig, Cacheable cacheable) {
 		// 这个builder是CacheOperation.Builder的子类，父类规定了所有注解通用的一些属性
 		CacheableOperation.Builder builder = new CacheableOperation.Builder();
@@ -153,7 +154,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 		builder.setCacheResolver(cacheable.cacheResolver());
 		builder.setSync(cacheable.sync());
 
-		// DefaultCacheConfig是本类的一个内部类，来处理buider，给他赋值默认值，比如默认的keyGenerator等等
+		// DefaultCacheConfig是本类的一个内部类，来处理builder，给他赋值默认值，比如默认的keyGenerator等等
 		defaultConfig.applyDefault(builder);
 		CacheableOperation op = builder.build();
 		// 校验。key和KeyGenerator至少得有一个，CacheManager和CacheResolver至少得配置一个
@@ -240,6 +241,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 	 * @return the default config (never {@code null})
 	 */
 	DefaultCacheConfig getDefaultCacheConfig(Class<?> target) {
+		// 获取类上CacheConfig注解
 		CacheConfig annotation = AnnotatedElementUtils.findMergedAnnotation(target, CacheConfig.class);
 		if (annotation != null) {
 			return new DefaultCacheConfig(annotation.cacheNames(), annotation.keyGenerator(),
@@ -330,6 +332,7 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 			if (StringUtils.hasText(builder.getCacheManager()) || StringUtils.hasText(builder.getCacheResolver())) {
 				// One of these is set so we should not inherit anything
 			}
+			// cacheResolver与cacheManager都配置了，只会设置cacheResolver值
 			else if (StringUtils.hasText(this.cacheResolver)) {
 				builder.setCacheResolver(this.cacheResolver);
 			}

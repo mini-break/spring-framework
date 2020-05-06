@@ -51,12 +51,18 @@ public class AnnotationCacheOperationSourceTests {
 	private final AnnotationCacheOperationSource source = new AnnotationCacheOperationSource();
 
 
+	/**
+	 * 单个注解
+	 */
 	@Test
 	public void singularAnnotation() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "singular", 1);
 		assertTrue(ops.iterator().next() instanceof CacheableOperation);
 	}
 
+	/**
+	 * 方法上有多个注解
+	 */
 	@Test
 	public void multipleAnnotation() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "multiple", 2);
@@ -78,12 +84,18 @@ public class AnnotationCacheOperationSourceTests {
 		getOps(AnnotatedClass.class, "emptyCaching", 0);
 	}
 
+	/**
+	 * 单类型化的注解
+	 */
 	@Test
 	public void singularStereotype() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "singleStereotype", 1);
 		assertTrue(ops.iterator().next() instanceof CacheEvictOperation);
 	}
 
+	/**
+	 * 多类型化的注解
+	 */
 	@Test
 	public void multipleStereotypes() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "multipleStereotype", 3);
@@ -97,6 +109,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertTrue(next.getCacheNames().contains("bar"));
 	}
 
+	/**
+	 * 单组合型注解
+	 */
 	@Test
 	public void singleComposedAnnotation() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "singleComposed", 2);
@@ -113,6 +128,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertThat(cacheOperation.getKey(), equalTo("composedKey"));
 	}
 
+	/**
+	 * 多组合型注解
+	 */
 	@Test
 	public void multipleComposedAnnotations() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "multipleComposed", 4);
@@ -146,6 +164,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertEquals("Custom key generator not set", "custom", cacheOperation.getKeyGenerator());
 	}
 
+	/**
+	 * 自定义key生成器
+	 */
 	@Test
 	public void customKeyGeneratorInherited() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "customKeyGeneratorInherited", 1);
@@ -153,12 +174,18 @@ public class AnnotationCacheOperationSourceTests {
 		assertEquals("Custom key generator not set", "custom", cacheOperation.getKeyGenerator());
 	}
 
+	/**
+	 * key与keyGenerator只能设置其中一个
+	 */
 	@Test
 	public void keyAndKeyGeneratorCannotBeSetTogether() {
 		this.exception.expect(IllegalStateException.class);
 		getOps(AnnotatedClass.class, "invalidKeyAndKeyGeneratorSet");
 	}
 
+	/**
+	 * 自定义cacheManager
+	 */
 	@Test
 	public void customCacheManager() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClass.class, "customCacheManager", 1);
@@ -187,16 +214,23 @@ public class AnnotationCacheOperationSourceTests {
 		assertEquals("Custom cache resolver not set", "custom", cacheOperation.getCacheResolver());
 	}
 
+	/**
+	 * cacheResolver与CacheManager不能同时设置
+	 */
 	@Test
 	public void cacheResolverAndCacheManagerCannotBeSetTogether() {
 		this.exception.expect(IllegalStateException.class);
 		getOps(AnnotatedClass.class, "invalidCacheResolverAndCacheManagerSet");
 	}
 
+	/**
+	 * 类级别注解及自定义cacheName注解
+	 */
 	@Test
 	public void fullClassLevelWithCustomCacheName() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClassWithFullDefault.class, "methodLevelCacheName", 1);
 		CacheOperation cacheOperation = ops.iterator().next();
+		// cacheManager和cacheResolver都设置时，只会cacheResolver生效
 		assertSharedConfig(cacheOperation, "classKeyGenerator", "", "classCacheResolver", "custom");
 	}
 
@@ -221,6 +255,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertSharedConfig(cacheOperation, "classKeyGenerator", "", "custom" , "classCacheName");
 	}
 
+	/**
+	 * @Cachable 未配置任务属性
+	 */
 	@Test
 	public void validateNoCacheIsValid() {
 		// Valid as a CacheResolver might return the cache names to use with other info
@@ -230,6 +267,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertEquals("no cache names specified", 0, cacheOperation.getCacheNames().size());
 	}
 
+	/**
+	 * 自定义类级注解及自定义cacheName注解
+	 */
 	@Test
 	public void customClassLevelWithCustomCacheName() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClassWithCustomDefault.class, "methodLevelCacheName", 1);
@@ -237,6 +277,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertSharedConfig(cacheOperation, "classKeyGenerator", "", "classCacheResolver", "custom");
 	}
 
+	/**
+	 * 几个CacheConfig配置，使用最接近的(@CacheConfig优先于自定义类级注解)
+	 */
 	@Test
 	public void severalCacheConfigUseClosest() {
 		Collection<CacheOperation> ops = getOps(MultipleCacheConfig.class, "multipleCacheConfig");
@@ -244,6 +287,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertSharedConfig(cacheOperation, "", "", "", "myCache");
 	}
 
+	/**
+	 * 缓存配置从接口中来
+	 */
 	@Test
 	public void cacheConfigFromInterface() {
 		Collection<CacheOperation> ops = getOps(InterfaceCacheConfig.class, "interfaceCacheConfig");
@@ -251,6 +297,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertSharedConfig(cacheOperation, "", "", "", "myCache");
 	}
 
+	/**
+	 * 缓存注解重写
+	 */
 	@Test
 	public void cacheAnnotationOverride() {
 		Collection<CacheOperation> ops = getOps(InterfaceCacheConfig.class, "interfaceCacheableOverride");
@@ -259,6 +308,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertTrue(cacheOperation instanceof CacheableOperation);
 	}
 
+	/**
+	 * 部分类级注解及自定义cacheManager注解
+	 */
 	@Test
 	public void partialClassLevelWithCustomCacheManager() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClassWithSomeDefault.class, "methodLevelCacheManager", 1);
@@ -266,6 +318,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertSharedConfig(cacheOperation, "classKeyGenerator", "custom", "", "classCacheName");
 	}
 
+	/**
+	 * 部分类级注解及自定义cacheResolver注解
+	 */
 	@Test
 	public void partialClassLevelWithCustomCacheResolver() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClassWithSomeDefault.class, "methodLevelCacheResolver", 1);
@@ -273,6 +328,9 @@ public class AnnotationCacheOperationSourceTests {
 		assertSharedConfig(cacheOperation, "classKeyGenerator", "", "custom", "classCacheName");
 	}
 
+	/**
+	 * 部分类级注解
+	 */
 	@Test
 	public void partialClassLevelWithNoCustomization() {
 		Collection<CacheOperation> ops = getOps(AnnotatedClassWithSomeDefault.class, "noCustomization", 1);

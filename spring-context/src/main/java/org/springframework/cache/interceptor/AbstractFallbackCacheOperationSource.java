@@ -97,6 +97,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		Object cacheKey = getCacheKey(method, targetClass);
 		Collection<CacheOperation> cached = this.attributeCache.get(cacheKey);
 
+		// 缓存中存在，直接返回
 		if (cached != null) {
 			return (cached != NULL_CACHING_ATTRIBUTE ? cached : null);
 		}
@@ -132,7 +133,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 	@Nullable
 	private Collection<CacheOperation> computeCacheOperations(Method method, @Nullable Class<?> targetClass) {
 		/**
-		 * allowPublicMethodsOnly()默认是false（子类复写后的默认值已经写为true了）
+		 * allowPublicMethodsOnly()默认是false（子类覆写后的默认值已经写为true了）
 		 * 也就是说：缓存注解只能标注在public方法上,不接收别非public方法
 		 */
 		// Don't allow no-public methods as required.
@@ -154,7 +155,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		}
 
 		/**
-		 * 第二步：方法上没有，就再去方法所在的类上去找。
+		 * 第二步：方法上没有，再去方法所在的类上去找。
 		 * isUserLevelMethod：我们自己书写的方法（非自动生成的） 才直接return，否则继续处理
 		 */
 		// Second try is the caching operation on the target class.
@@ -164,7 +165,7 @@ public abstract class AbstractFallbackCacheOperationSource implements CacheOpera
 		}
 
 		/**
-		 * 他俩不相等，说明method这个方法它是标注在接口上的，这里也给与了支持
+		 * 他俩不相等，说明method这个方法是标注在接口上的，这里也给与了支持
 		 * 此处透露的性息：我们的缓存注解也可以标注在接口方法上，比如MyBatis的接口上都是ok的
 		 */
 		if (specificMethod != method) {

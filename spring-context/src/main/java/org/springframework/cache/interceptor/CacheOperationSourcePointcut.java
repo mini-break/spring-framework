@@ -36,7 +36,9 @@ abstract class CacheOperationSourcePointcut extends StaticMethodMatcherPointcut 
 
 	@Override
 	public boolean matches(Method method, @Nullable Class<?> targetClass) {
+		// 获取到当前的缓存属性源,getCacheOperationSource()是个抽象方法
 		CacheOperationSource cas = getCacheOperationSource();
+		// 下面一句话解释为：如果方法/类上标注有缓存相关的注解，就切入进取
 		return (cas != null && !CollectionUtils.isEmpty(cas.getCacheOperations(method, targetClass)));
 	}
 
