@@ -166,6 +166,8 @@ import org.springframework.core.Ordered;
  * @see CachingConfigurationSelector
  * @see ProxyCachingConfiguration
  * @see org.springframework.cache.aspectj.AspectJCachingConfiguration
+ *
+ * @EnableCaching 主要向容器注入了三个Bean：CacheOperationSource、BeanFactoryCacheOperationSourceAdvisor、CacheInterceptor
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

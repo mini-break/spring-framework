@@ -27,13 +27,21 @@ import org.springframework.lang.Nullable;
  *
  * @author Costin Leau
  * @since 3.1
+ *
+ * 缓存增强
  */
 @SuppressWarnings("serial")
 public class BeanFactoryCacheOperationSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
+	/**
+	 * 持有cacheOperationSource
+	 */
 	@Nullable
 	private CacheOperationSource cacheOperationSource;
 
+	/**
+	 * 切面
+	 */
 	private final CacheOperationSourcePointcut pointcut = new CacheOperationSourcePointcut() {
 		@Override
 		@Nullable
@@ -53,6 +61,7 @@ public class BeanFactoryCacheOperationSourceAdvisor extends AbstractBeanFactoryP
 	}
 
 	/**
+	 * 此处你可以自定义一个ClassFilter，过滤掉你想忽略的类
 	 * Set the {@link ClassFilter} to use for this pointcut.
 	 * Default is {@link ClassFilter#TRUE}.
 	 */

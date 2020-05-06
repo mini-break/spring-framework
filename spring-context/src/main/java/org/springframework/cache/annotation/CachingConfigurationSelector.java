@@ -81,6 +81,7 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 	private String[] getProxyImports() {
 		List<String> result = new ArrayList<>(3);
 		result.add(AutoProxyRegistrar.class.getName());
+		// @EnableCaching主要向容器注入了三个Bean：CacheOperationSource、BeanFactoryCacheOperationSourceAdvisor、CacheInterceptor
 		result.add(ProxyCachingConfiguration.class.getName());
 		if (jsr107Present && jcacheImplPresent) {
 			result.add(PROXY_JCACHE_CONFIGURATION_CLASS);
