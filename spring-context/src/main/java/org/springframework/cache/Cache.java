@@ -31,20 +31,26 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @author Stephane Nicoll
  * @since 3.1
+ *
+ * 每个Cache必须要指定一个name，这个name需要在CacheManager中是唯一的。另外Cache对象还需要支持一些数据操作，存放数据、获取数据、驱除数据等等
  */
 public interface Cache {
 
 	/**
+	 * 获取该Cache的名称
 	 * Return the cache name.
 	 */
 	String getName();
 
 	/**
+	 * 返回底层真正的缓存对象，接口中并不需要关心具体是怎么实现的，
+	 * 使用Map、Redis、Guava，Ehcache等
 	 * Return the underlying native cache provider.
 	 */
 	Object getNativeCache();
 
 	/**
+	 * 返回被包装的值，主要是为了null的处理
 	 * Return the value to which this cache maps the specified key.
 	 * <p>Returns {@code null} if the cache contains no mapping for this key;
 	 * otherwise, the cached value (which may be {@code null} itself) will
@@ -60,6 +66,7 @@ public interface Cache {
 	ValueWrapper get(Object key);
 
 	/**
+	 * 返回缓存中指定key的值，并获得这个值的特定类型
 	 * Return the value to which this cache maps the specified key,
 	 * generically specifying a type that return value will be cast to.
 	 * <p>Note: This variant of {@code get} does not allow for differentiating
@@ -99,6 +106,7 @@ public interface Cache {
 	<T> T get(Object key, Callable<T> valueLoader);
 
 	/**
+	 * 存放key-value数据到缓存中
 	 * Associate the specified value with the specified key in this cache.
 	 * <p>If the cache previously contained a mapping for this key, the old
 	 * value is replaced by the specified value.
@@ -108,6 +116,7 @@ public interface Cache {
 	void put(Object key, @Nullable Object value);
 
 	/**
+	 * 如果传入key对应的value已经存在，就返回存在的value，不进行替换。如果不存在，就添加key和value，返回null
 	 * Atomically associate the specified value with the specified key in this cache
 	 * if it is not set already.
 	 * <p>This is equivalent to:
@@ -137,12 +146,14 @@ public interface Cache {
 	ValueWrapper putIfAbsent(Object key, @Nullable Object value);
 
 	/**
+	 * 从缓存中删除指定key的数据
 	 * Evict the mapping for this key from this cache if it is present.
 	 * @param key the key whose mapping is to be removed from the cache
 	 */
 	void evict(Object key);
 
 	/**
+	 * 删除缓存中所有数据
 	 * Remove all mappings from the cache.
 	 */
 	void clear();

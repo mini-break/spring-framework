@@ -90,7 +90,7 @@ class CacheOperationExpressionEvaluator extends CachedExpressionEvaluator {
 		// root对象，此对象的属性决定了你的#root能够取值的范围
 		CacheExpressionRootObject rootObject = new CacheExpressionRootObject(
 				caches, method, args, target, targetClass);
-		// 它继承自MethodBasedEvaluationContext
+		// 估值上下文
 		CacheEvaluationContext evaluationContext = new CacheEvaluationContext(
 				rootObject, targetMethod, args, getParameterNameDiscoverer());
 		if (result == RESULT_UNAVAILABLE) {

@@ -623,10 +623,20 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 	}
 
 
+	/**
+	 * 缓存属性的上下文。每个方法可以对应多个上下文
+	 */
 	private class CacheOperationContexts {
 
+		/**
+		 * 因为方法上可以标注多个注解
+		 * 需要注意的是它的key是Class，而CacheOperation的子类也就那三个而已
+		 */
 		private final MultiValueMap<Class<? extends CacheOperation>, CacheOperationContext> contexts;
 
+		/**
+		 * 是否要求同步执行，默认值是false
+		 */
 		private final boolean sync;
 
 		public CacheOperationContexts(Collection<? extends CacheOperation> operations, Method method,
@@ -648,37 +658,48 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			return this.sync;
 		}
 
+		/**
+		 * 因为只有@Cacheable有sync属性，所以只需要看CacheableOperation即可
+		 */
 		private boolean determineSyncFlag(Method method) {
 			List<CacheOperationContext> cacheOperationContexts = this.contexts.get(CacheableOperation.class);
 			if (cacheOperationContexts == null) {  // no @Cacheable operation at all
 				return false;
 			}
 			boolean syncEnabled = false;
+			// 只要有一个@Cacheable的sync=true了，那就为true  并且下面还有检查逻辑
 			for (CacheOperationContext cacheOperationContext : cacheOperationContexts) {
 				if (((CacheableOperation) cacheOperationContext.getOperation()).isSync()) {
 					syncEnabled = true;
 					break;
 				}
 			}
+			// 执行sync=true的检查逻辑
 			if (syncEnabled) {
+				// sync=true时候，不能还有其它的缓存操作 也就是说@Cacheable(sync=true)的时候只能单独使用
 				if (this.contexts.size() > 1) {
 					throw new IllegalStateException(
 							"@Cacheable(sync=true) cannot be combined with other cache operations on '" + method + "'");
 				}
+				// @Cacheable(sync=true)时，多个@Cacheable也是不允许的
 				if (cacheOperationContexts.size() > 1) {
 					throw new IllegalStateException(
 							"Only one @Cacheable(sync=true) entry is allowed on '" + method + "'");
 				}
+				// 拿到唯一的一个@Cacheable
 				CacheOperationContext cacheOperationContext = cacheOperationContexts.iterator().next();
 				CacheableOperation operation = (CacheableOperation) cacheOperationContext.getOperation();
+				// @Cacheable(sync=true)时，cacheName只能使用一个
 				if (cacheOperationContext.getCaches().size() > 1) {
 					throw new IllegalStateException(
 							"@Cacheable(sync=true) only allows a single cache on '" + operation + "'");
 				}
+				// sync=true时，unless属性是不支持的，并且是不能写的
 				if (StringUtils.hasText(operation.getUnless())) {
 					throw new IllegalStateException(
 							"@Cacheable(sync=true) does not support unless attribute on '" + operation + "'");
 				}
+				// 只有校验都通过后，才返回true
 				return true;
 			}
 			return false;
@@ -728,18 +749,31 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 		/**
 		 * 它里面包含了CacheOperation、Method、Class、Method targetMethod;(注意有两个Method)、AnnotatedElementKey、KeyGenerator、CacheResolver等属性
+		 * metadata中的属性是通过CacheOperation中的属性来设置
 		 * this.method = BridgeMethodResolver.findBridgedMethod(method);
 		 * this.targetMethod = (!Proxy.isProxyClass(targetClass) ? AopUtils.getMostSpecificMethod(method, targetClass)  : this.method);
 		 * this.methodKey = new AnnotatedElementKey(this.targetMethod, targetClass);
 		 */
 		private final CacheOperationMetadata metadata;
 
+		/**
+		 * 执行方法的参数
+		 */
 		private final Object[] args;
 
+		/**
+		 * 执行方法的目标类对象
+		 */
 		private final Object target;
 
+		/**
+		 * 执行方法可以获取到的缓存对象集合，也就是@CachePut等设置的value值关联的那个Cache对象
+		 */
 		private final Collection<? extends Cache> caches;
 
+		/**
+		 * 执行方法使用缓存注解设置的缓存名称，例如:@CachePut(value="cacheName")
+		 */
 		private final Collection<String> cacheNames;
 
 		public CacheOperationContext(CacheOperationMetadata metadata, Object[] args, Object target) {
@@ -783,12 +817,15 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			return combinedArgs;
 		}
 
+		/**
+		 * 这个方法用来判断缓存条件condition
+		 */
 		protected boolean isConditionPassing(@Nullable Object result) {
 			if (StringUtils.hasText(this.metadata.operation.getCondition())) {
 				/**
-				 *  执行上下文：此处就不得不提一个非常重要的它了：CacheOperationExpressionEvaluator
-				 * 	它代表着缓存操作中SpEL的执行上下文, 具体可以先参与下面的对它的介绍
-				 * 	解析condition
+				 * 首先判断CacheOperation是否设置了conditions条件
+				 * 如果没有设置条件，则直接通过条件检测
+				 * 如果设置了条件，那么通过evaluator去判断（ExpressionEvaluator evaluator 会通过SpEL表达式去检测）
 				 */
 				EvaluationContext evaluationContext = createEvaluationContext(result);
 				return evaluator.condition(this.metadata.operation.getCondition(),
@@ -799,6 +836,7 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 		/**
 		 * 解析CacheableOperation和CachePutOperation的unless
+		 * 处理@Cacheable、@CachePut中unless，如果unless通过SpEL检测，则否决存放缓存
 		 */
 		protected boolean canPutToCache(@Nullable Object value) {
 			String unless = "";
@@ -834,6 +872,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 			return this.metadata.keyGenerator.generate(this.target, this.metadata.method, this.args);
 		}
 
+		/**
+		 * 创建估值上下文
+		 */
 		private EvaluationContext createEvaluationContext(@Nullable Object result) {
 			return evaluator.createEvaluationContext(this.caches, this.metadata.method, this.args,
 					this.target, this.metadata.targetClass, this.metadata.targetMethod, result, beanFactory);

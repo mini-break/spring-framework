@@ -89,12 +89,12 @@ public abstract class AbstractCacheResolver implements CacheResolver, Initializi
 
 	@Override
 	public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> context) {
-		// getCacheNames抽象方法，子类去实现
+		// 获取缓存名称，默认使用SimpleCacheResolver，也就是获取@CachePut(value={"cacheName1", "cacheName2"})注解中的值。
 		Collection<String> cacheNames = getCacheNames(context);
 		if (cacheNames == null) {
 			return Collections.emptyList();
 		}
-		// 根据cacheNames  去CacheManager里面拿到Cache对象， 作为最终的返回
+		// 通过缓存名称，从CacheManager中去找到关联的Cache对象。
 		Collection<Cache> result = new ArrayList<>(cacheNames.size());
 		for (String cacheName : cacheNames) {
 			Cache cache = getCacheManager().getCache(cacheName);

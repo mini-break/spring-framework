@@ -40,13 +40,25 @@ import org.springframework.util.StringUtils;
 public class ConcurrentMapCacheFactoryBean
 		implements FactoryBean<ConcurrentMapCache>, BeanNameAware, InitializingBean {
 
+	/**
+	 * 定义Cache的名称
+	 */
 	private String name = "";
 
+	/**
+	 * 注入到Spring时缓存存储的数据
+	 */
 	@Nullable
 	private ConcurrentMap<Object, Object> store;
 
+	/**
+	 * 是否允许null值
+	 */
 	private boolean allowNullValues = true;
 
+	/**
+	 * 真实的Cache实现类
+	 */
 	@Nullable
 	private ConcurrentMapCache cache;
 
@@ -77,6 +89,9 @@ public class ConcurrentMapCacheFactoryBean
 		this.allowNullValues = allowNullValues;
 	}
 
+	/**
+	 * 以Spring注入的beanName作为Cache的名称
+	 */
 	@Override
 	public void setBeanName(String beanName) {
 		if (!StringUtils.hasLength(this.name)) {
@@ -84,6 +99,10 @@ public class ConcurrentMapCacheFactoryBean
 		}
 	}
 
+
+	/**
+	 * 对象注入到Spring的时候就初始化好了Cache对象（ConcurrentMapCache）
+	 */
 	@Override
 	public void afterPropertiesSet() {
 		this.cache = (this.store != null ? new ConcurrentMapCache(this.name, this.store, this.allowNullValues) :

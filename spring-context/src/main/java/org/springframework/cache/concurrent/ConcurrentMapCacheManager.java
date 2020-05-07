@@ -45,11 +45,24 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 3.1
  * @see ConcurrentMapCache
+ *
+ * ConcurrentMapCacheManager负责管理ConcurrentMapCache对象，支持懒加载获取，也支持预先实例化对象，
+ * 通过调用#setCacheNames方法可以预定义一些ConcurrentMapCache到ConcurrentMapCacheManager中，
+ * 但是一旦设置过后，dynamic就会设置为false，这时就不再支持动态创建Cache功能。
+ *
+ * 通常是否懒加载可以通过不同的构造器来控制，new ConcurrentMapCacheManager()创建懒加载的CacheManager，
+ * new ConcurrentMapCacheManager(String... cacheNames)创建预先定义Cache的CacheManager。
  */
 public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderAware {
 
+	/**
+	 * 使用ConcurrentMap来管理Cache集合对象
+	 */
 	private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<>(16);
 
+	/**
+	 * 表示是否可以动态创建Cache缓存，如果指定过name那么就不能动态创建
+	 */
 	private boolean dynamic = true;
 
 	private boolean allowNullValues = true;
@@ -77,6 +90,9 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 
 
 	/**
+	 * 这里会初始化ConcurrentMapCache，并存放到ConcurrentMap中进行管理
+	 * 一旦初始化过，这dynamic=false，再调用getCache(name)时就不会动态创建了
+	 *
 	 * Specify the set of cache names for this CacheManager's 'static' mode.
 	 * <p>The number of caches and their names will be fixed after a call to this method,
 	 * with no creation of further cache regions at runtime.
@@ -161,6 +177,10 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 		return Collections.unmodifiableSet(this.cacheMap.keySet());
 	}
 
+	/**
+	 * 根据缓存name来获取关联的ConcurrentMapCache实例
+	 * 如果ConcurrentMapCacheManager中没有获取到，则动态获取。（能否动态获取需要看dynamic是否为true）
+	 */
 	@Override
 	@Nullable
 	public Cache getCache(String name) {
@@ -184,6 +204,7 @@ public class ConcurrentMapCacheManager implements CacheManager, BeanClassLoaderA
 	}
 
 	/**
+	 * 创建Cache对象
 	 * Create a new ConcurrentMapCache instance for the specified cache name.
 	 * @param name the name of the cache
 	 * @return the ConcurrentMapCache (or a decorator thereof)

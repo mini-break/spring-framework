@@ -44,7 +44,8 @@ import org.springframework.core.annotation.AliasFor;
  * @author Sam Brannen
  * @since 3.1
  * @see CacheConfig
- * 缓存更新
+ *
+ * @CachePut 表示需要存放缓存数据，可以在类或方法上进行注解，如果注解在类上，表示这个类的所有方法都使用了@CachePut
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -53,6 +54,7 @@ import org.springframework.core.annotation.AliasFor;
 public @interface CachePut {
 
 	/**
+	 * 定义存放的Cache名称，和下面的cacheNames一样
 	 * Alias for {@link #cacheNames}.
 	 */
 	@AliasFor("cacheNames")
@@ -70,6 +72,8 @@ public @interface CachePut {
 	String[] cacheNames() default {};
 
 	/**
+	 * 为缓存值定义的key，默认为""，表示所有的参数都加入到key的生成中（使用默认的keyGenerator）
+	 *
 	 * Spring Expression Language (SpEL) expression for computing the key dynamically.
 	 * <p>Default is {@code ""}, meaning all method parameters are considered as a key,
 	 * unless a custom {@link #keyGenerator} has been set.
@@ -92,6 +96,8 @@ public @interface CachePut {
 	String key() default "";
 
 	/**
+	 * 可以使用keyGenerator来自定义key的生成，但是keyGenerator和key是排它性的，也就是说key和keyGenerator只能定义其中一个
+	 *
 	 * The bean name of the custom {@link org.springframework.cache.interceptor.KeyGenerator}
 	 * to use.
 	 * <p>Mutually exclusive with the {@link #key} attribute.
@@ -100,6 +106,8 @@ public @interface CachePut {
 	String keyGenerator() default "";
 
 	/**
+	 * 指定设置特定的cacheManager，与cacheResolver也是排它性的
+	 *
 	 * The bean name of the custom {@link org.springframework.cache.CacheManager} to use to
 	 * create a default {@link org.springframework.cache.interceptor.CacheResolver} if none
 	 * is set already.
@@ -110,6 +118,8 @@ public @interface CachePut {
 	String cacheManager() default "";
 
 	/**
+	 * 自定义cacheResolver
+	 *
 	 * The bean name of the custom {@link org.springframework.cache.interceptor.CacheResolver}
 	 * to use.
 	 * @see CacheConfig#cacheResolver
@@ -117,6 +127,8 @@ public @interface CachePut {
 	String cacheResolver() default "";
 
 	/**
+	 * 定义缓存被存放的条件，只有满足条件的方法返回值才能被存放。默认为""，也意味着方法的结果都可以被缓存
+	 *
 	 * Spring Expression Language (SpEL) expression used for making the cache
 	 * put operation conditional.
 	 * <p>Default is {@code ""}, meaning the method result is always cached.
@@ -136,6 +148,8 @@ public @interface CachePut {
 	String condition() default "";
 
 	/**
+	 * unless是在方法调用后判断是否需要进行缓存更新，如果满足unless条件就不缓存。unless具有否决权
+	 *
 	 * Spring Expression Language (SpEL) expression used to veto the cache put operation.
 	 * <p>Unlike {@link #condition}, this expression is evaluated after the method
 	 * has been called and can therefore refer to the {@code result}.
