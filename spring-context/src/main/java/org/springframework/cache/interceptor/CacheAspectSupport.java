@@ -418,9 +418,9 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 
 		/**
-		 * 最先处理@CacheEvict注解~~~真正执行的方法请参见：performCacheEvict
+		 * 处理beforeInterceptor=true的缓存删除操作
 		 * context.getCaches()拿出所有的caches，看看是执行cache.evict(key);方法还是cache.clear();而且
-		 * 需要注意的的是context.isConditionPassing(result); condition条件此处生效，并且可以使用#result
+		 * 需要注意的是context.isConditionPassing(result); condition条件此处生效，并且可以使用#result
 		 * context.generateKey(result)也能使用#result
 		 * @CacheEvict 没有unless属性
 		 */
@@ -630,7 +630,8 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 
 		/**
 		 * 因为方法上可以标注多个注解
-		 * 需要注意的是它的key是Class，而CacheOperation的子类也就那三个而已
+		 * 保存每种类型缓存操作的上下文数据，Map中的key是CacheOperation类型，也就是@CachePut、@Cacheable、@CacheEvict对应的3中CacheOperation实现类型。
+		 * 	Map中的value是CacheOperationContext。另外注意，这个Map不是普通的Map，而是一个MultiValueMap，这种Map的key是可以重复存放的。
 		 */
 		private final MultiValueMap<Class<? extends CacheOperation>, CacheOperationContext> contexts;
 
