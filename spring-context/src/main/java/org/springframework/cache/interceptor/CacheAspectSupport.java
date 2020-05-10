@@ -857,8 +857,8 @@ public abstract class CacheAspectSupport extends AbstractCacheInvoker
 		/**
 		 * 这里注意：生成key  需要注意步骤。
 		 * 若配置了key（非空串）：那就作为SpEL解析出来
-		 * 否则走keyGenerator去生成（所以你会发现，即使咱们没有配置key和keyGenerator，程序依旧能正常work,只是生成的key很长而已~~~）
-		 * （keyGenerator你可以能没配置？）
+		 * 否则走keyGenerator去生成（所以你会发现，即使咱们没有配置key和keyGenerator，程序依旧能正常work,只是生成的key很长而已）
+		 * （keyGenerator你可以没配置？）
 		 * 若你自己没有手动指定过KeyGenerator，那会使用默认的SimpleKeyGenerator 它的实现比较简单
 		 * 其实若我们自定义KeyGenerator，我觉得可以继承自`SimpleKeyGenerator `，而不是直接实现接口
 		 * Compute the key for the given caching operation.
