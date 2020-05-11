@@ -33,6 +33,9 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractValueAdaptingCache implements Cache {
 
+	/**
+	 * 是否允许null值
+	 */
 	private final boolean allowNullValues;
 
 
